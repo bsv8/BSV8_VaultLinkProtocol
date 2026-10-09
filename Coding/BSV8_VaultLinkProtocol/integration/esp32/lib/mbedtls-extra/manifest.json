@@ -1,0 +1,22 @@
+[
+  {
+    "file": "hkdf.c",
+    "url": "https://raw.githubusercontent.com/Mbed-TLS/mbedtls/v2.28.7/library/hkdf.c",
+    "sha256": "c23ddf951e5037cf279a8974a6b228711ecdc0e7ada33b0eb3937f540079391c"
+  },
+  {
+    "file": "ripemd160.c",
+    "url": "https://raw.githubusercontent.com/Mbed-TLS/mbedtls/v2.28.7/library/ripemd160.c",
+    "sha256": "393289530b236a1e59b17e1681497317baae88599164fb86e2483936165a9db7"
+  },
+  {
+    "file": "common.h",
+    "url": "https://raw.githubusercontent.com/Mbed-TLS/mbedtls/v2.28.7/library/common.h",
+    "sha256": "feaf8afb7f7dbb92d3fabd3a2bd8e1ed5fac71d7c0bfda87a121d4d59946673a"
+  },
+  {
+    "file": "LICENSE",
+    "url": "https://raw.githubusercontent.com/Mbed-TLS/mbedtls/v2.28.7/LICENSE",
+    "sha256": "9b405ef4c89342f5eae1dd828882f931747f71001cfba7d114801039b52ad09b"
+  }
+]

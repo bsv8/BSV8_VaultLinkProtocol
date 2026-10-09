@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vaultlink.invalid/schemas/vlp/0.1/handshake.schema.json",
+  "title": "VLP 0.1 握手消息",
+  "description": "结构性检查。HELLO / HELLO_ACK / PAIR_* / POSSESSION_* 的字段结构，依据 spec/core/04-握手与链路.md。密码学正确性（transcript、HKDF、配对码、持有权验签）不由本 schema 判断。",
+  "$defs": {
+    "hello": {
+      "type": "object",
+      "required": ["hostEph", "hostNonce", "capabilities", "protocolVersion", "walletGeneration", "backendGeneration", "hostRunGeneration"],
+      "additionalProperties": false,
+      "properties": {
+        "hostEph": { "$ref": "#/$defs/bytes32" },
+        "hostNonce": { "$ref": "#/$defs/bytes32" },
+        "capabilities": {
+          "type": "array",
+          "maxItems": 64,
+          "items": { "type": "integer", "minimum": 0 }
+        },
+        "protocolVersion": { "const": 1 },
+        "walletGeneration": { "$ref": "#/$defs/nonzeroU32" },
+        "backendGeneration": { "$ref": "#/$defs/nonzeroU32" },
+        "hostRunGeneration": { "$ref": "#/$defs/nonzeroU32" }
+      }
+    },
+    "helloAck": {
+      "type": "object",
+      "required": ["state", "language", "deviceEph", "publicKey", "deviceNonce", "deviceRunId", "capabilities", "connectionId", "firmwareBuildId", "pairingRequired", "protocolVersion", "supportsLockedInfo"],
+      "additionalProperties": false,
+      "properties": {
+        "state": { "type": "integer", "minimum": 0, "maximum": 5 },
+        "language": { "type": "string", "enum": ["en", "zh-Hans", "zh-Hant", "zh-Hk", "ja"] },
+        "deviceEph": { "$ref": "#/$defs/bytes32" },
+        "publicKey": { "type": "string", "pattern": "^0[23][0-9a-f]{64}$" },
+        "deviceNonce": { "$ref": "#/$defs/bytes32" },
+        "deviceRunId": { "$ref": "#/$defs/nonzeroU32" },
+        "capabilities": {
+          "type": "array",
+          "maxItems": 64,
+          "items": { "type": "integer", "minimum": 0 }
+        },
+        "connectionId": { "$ref": "#/$defs/nonzeroU32" },
+        "firmwareBuildId": { "type": "string", "minLength": 1, "maxLength": 32 },
+        "pairingRequired": { "type": "boolean" },
+        "protocolVersion": { "const": 1 },
+        "supportsLockedInfo": { "type": "boolean" }
+      }
+    },
+    "pairConfirm": {
+      "type": "object",
+      "required": ["code"],
+      "additionalProperties": false,
+      "properties": {
+        "code": { "type": "string", "pattern": "^[0-9]{6}$" }
+      }
+    },
+    "pairOk": {
+      "type": "object",
+      "required": ["paired", "protocolVersion"],
+      "additionalProperties": false,
+      "properties": {
+        "paired": { "const": true },
+        "protocolVersion": { "const": 1 }
+      }
+    },
+    "possessionProve": {
+      "type": "object",
+      "required": ["challenge"],
+      "additionalProperties": false,
+      "properties": { "challenge": { "$ref": "#/$defs/bytes32" } }
+    },
+    "possessionOk": {
+      "type": "object",
+      "required": ["challenge", "publicKey", "sessionId", "signature", "statementDigest"],
+      "additionalProperties": false,
+      "properties": {
+        "challenge": { "$ref": "#/$defs/bytes32" },
+        "publicKey": { "type": "string", "pattern": "^0[23][0-9a-f]{64}$" },
+        "sessionId": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+        "signature": { "type": "string", "pattern": "^[0-9a-f]+$" },
+        "statementDigest": { "$ref": "#/$defs/bytes32" }
+      }
+    },
+    "bytes32": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "nonzeroU32": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 4294967295,
+      "description": "世代随机数不得为 0。"
+    }
+  },
+  "oneOf": [
+    { "$ref": "#/$defs/hello" },
+    { "$ref": "#/$defs/helloAck" },
+    { "$ref": "#/$defs/pairConfirm" },
+    { "$ref": "#/$defs/pairOk" },
+    { "$ref": "#/$defs/possessionProve" },
+    { "$ref": "#/$defs/possessionOk" }
+  ]
+}

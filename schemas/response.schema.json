@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vaultlink.invalid/schemas/vlp/0.1/response.schema.json",
+  "title": "VLP 0.1 结果与错误信封",
+  "description": "结构性检查。依据 spec/core/03-帧与消息.md §6 与 spec/core/07-错误码.md。结果的业务有效性（验签、解封一致性）不由本 schema 判断。",
+  "oneOf": [
+    { "$ref": "#/$defs/error" },
+    { "$ref": "#/$defs/result" }
+  ],
+  "$defs": {
+    "error": {
+      "type": "object",
+      "required": ["error", "requestId"],
+      "additionalProperties": false,
+      "properties": {
+        "error": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 14,
+          "enum": [
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
+          ],
+          "description": "0 ok / 1 locked / 2 busy / 3 unsupported / 4 version-mismatch / 5 wrong-key / 6 invalid-request / 7 invalid-evidence / 8 denied-once / 9 denied-session / 10 revoked / 11 disconnected / 12 timeout / 13 result-unknown / 14 migration-conflict"
+        },
+        "requestId": { "type": "integer", "minimum": 0, "maximum": 4294967295 }
+      }
+    },
+    "result": {
+      "type": "object",
+      "required": ["payload", "requestId"],
+      "additionalProperties": false,
+      "properties": {
+        "payload": {
+          "type": ["object", "null"],
+          "description": "Profile 结果；无负载时为 null。"
+        },
+        "requestId": { "type": "integer", "minimum": 0, "maximum": 4294967295 }
+      }
+    },
+    "signatureFormat": {
+      "type": "string",
+      "enum": ["der-strict-lows", "compact-lows"],
+      "description": "签名类结果必须回报所用格式；不得让主机猜测。"
+    },
+    "publicKey": {
+      "type": "string",
+      "pattern": "^0[23][0-9a-f]{64}$"
+    }
+  }
+}

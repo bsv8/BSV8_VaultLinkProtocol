@@ -1,0 +1,147 @@
+{
+  "suite": "cbor-negative",
+  "version": "0.1",
+  "note": "全部为结构层负向量：解码器必须直接拒绝。业务层负向量（未知字段、缺必填、换对象等）在 profiles/envelope-negative.json，由 schemas 校验。",
+  "cases": [
+    {
+      "id": "cbor-neg-missing-field",
+      "description": "缺必填字段：声明 2 对只写 1 对",
+      "bytes": "a2626f706964656e746974792e70726f766563707570706f7365737070",
+      "probe": "map",
+      "expectError": "map-pair-count-mismatch"
+    },
+    {
+      "id": "cbor-neg-out-of-order",
+      "description": "乱序键：长度变小",
+      "bytes": "a2627a7a01616102",
+      "probe": "map",
+      "expectError": "key-out-of-order"
+    },
+    {
+      "id": "cbor-neg-byte-order-descending",
+      "description": "等长但字节序递减",
+      "bytes": "a2616201616102",
+      "probe": "map",
+      "expectError": "key-out-of-order"
+    },
+    {
+      "id": "cbor-neg-duplicate-key",
+      "description": "重复键",
+      "bytes": "a2616101616102",
+      "probe": "map",
+      "expectError": "duplicate-key"
+    },
+    {
+      "id": "cbor-neg-extra-key-past-declared",
+      "description": "键数多于声明对数",
+      "bytes": "a26161016162ff02",
+      "probe": "map",
+      "expectError": "more-keys-than-declared"
+    },
+    {
+      "id": "cbor-neg-key-too-long",
+      "description": "键名 32 字节超限（上限 31）",
+      "bytes": "a17820787878787878787878787878787878787878787878787878787878787878787801",
+      "probe": "map",
+      "expectError": "key-length-out-of-range"
+    },
+    {
+      "id": "cbor-neg-non-minimal-int",
+      "description": "非最短整数 0x18 0x17",
+      "bytes": "1817",
+      "probe": "uint",
+      "expectError": "non-minimal-integer"
+    },
+    {
+      "id": "cbor-neg-non-minimal-length",
+      "description": "非最短长度头 0x59 0x00 0x05",
+      "bytes": "59000568656c6c6f",
+      "probe": "bytes",
+      "expectError": "non-minimal-integer"
+    },
+    {
+      "id": "cbor-neg-indefinite-length",
+      "description": "不定长（ai 31）禁止",
+      "bytes": "5f",
+      "probe": "map",
+      "expectError": "forbidden-additional-info"
+    },
+    {
+      "id": "cbor-neg-tag",
+      "description": "标签（major 6）禁止",
+      "bytes": "c074323031332d30332d32315432303a30343a30305a",
+      "probe": "uint",
+      "expectError": "unexpected-major-type"
+    },
+    {
+      "id": "cbor-neg-float",
+      "description": "浮点禁止",
+      "bytes": "fb3ff199999999999a",
+      "probe": "uint",
+      "expectError": "forbidden-additional-info"
+    },
+    {
+      "id": "cbor-neg-undefined",
+      "description": "undefined (0xF7) 禁止",
+      "bytes": "f7",
+      "probe": "boolean",
+      "expectError": "unexpected-simple-value"
+    },
+    {
+      "id": "cbor-neg-bool-simple",
+      "description": "ai 24 形式的 simple value 禁止",
+      "bytes": "f818",
+      "probe": "boolean",
+      "expectError": "unexpected-simple-value"
+    },
+    {
+      "id": "cbor-neg-trailing-bytes",
+      "description": "尾随字节：顶层不是 map 或有多余字节",
+      "bytes": "0001",
+      "probe": "map",
+      "expectError": "trailing-bytes"
+    },
+    {
+      "id": "cbor-neg-depth-exceeded",
+      "description": "嵌套深度超 6",
+      "bytes": "8181818181818181",
+      "probe": "array",
+      "expectError": "depth-exceeded"
+    },
+    {
+      "id": "cbor-neg-declared-length-exceeds-input",
+      "description": "声明长度超过剩余输入（不得预分配）",
+      "bytes": "590400",
+      "probe": "bytes",
+      "expectError": "declared-length-exceeds-input"
+    },
+    {
+      "id": "cbor-neg-bad-utf8-text",
+      "description": "文本串非良构 UTF-8",
+      "bytes": "62c328",
+      "probe": "text",
+      "expectError": "invalid-utf8"
+    },
+    {
+      "id": "cbor-neg-surrogate-utf8",
+      "description": "UTF-8 代理区码点 U+D800 拒绝",
+      "bytes": "63eda080",
+      "probe": "text",
+      "expectError": "invalid-utf8"
+    },
+    {
+      "id": "cbor-neg-pairs-exceed-limit",
+      "description": "map 对数超上限 24",
+      "bytes": "a5616100",
+      "probe": "map",
+      "expectError": "map-pair-count-out-of-range"
+    },
+    {
+      "id": "cbor-neg-array-count-exceeds-input",
+      "description": "数组声明元素数超过剩余输入",
+      "bytes": "9a000000ff01",
+      "probe": "array",
+      "expectError": "declared-element-count-exceeds-input"
+    }
+  ]
+}

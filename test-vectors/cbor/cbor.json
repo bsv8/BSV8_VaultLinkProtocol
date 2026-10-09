@@ -1,0 +1,156 @@
+{
+  "suite": "cbor",
+  "version": "0.1",
+  "cases": [
+    {
+      "id": "cbor-int-shortest",
+      "description": "整数一律最短表示（spec/core/02-编码.md §2.3）",
+      "items": [
+        {
+          "value": 0,
+          "expect": "00"
+        },
+        {
+          "value": 1,
+          "expect": "01"
+        },
+        {
+          "value": 23,
+          "expect": "17"
+        },
+        {
+          "value": 24,
+          "expect": "1818"
+        },
+        {
+          "value": 255,
+          "expect": "18ff"
+        },
+        {
+          "value": 256,
+          "expect": "190100"
+        },
+        {
+          "value": 65535,
+          "expect": "19ffff"
+        },
+        {
+          "value": 65536,
+          "expect": "1a00010000"
+        },
+        {
+          "value": 4294967295,
+          "expect": "1affffffff"
+        },
+        {
+          "value": 4294967296,
+          "expect": "1b0000000100000000"
+        }
+      ]
+    },
+    {
+      "id": "cbor-int-negative",
+      "description": "负整数 major 1，参数为 -1-v（spec/core/02-编码.md §2.3）",
+      "items": [
+        {
+          "value": -1,
+          "expect": "20"
+        },
+        {
+          "value": -24,
+          "expect": "37"
+        },
+        {
+          "value": -25,
+          "expect": "3818"
+        },
+        {
+          "value": -1000,
+          "expect": "3903e7"
+        }
+      ]
+    },
+    {
+      "id": "cbor-simple",
+      "description": "仅允许 false/true/null；其余 simple 与浮点禁止",
+      "items": [
+        {
+          "value": false,
+          "expect": "f4"
+        },
+        {
+          "value": true,
+          "expect": "f5"
+        },
+        {
+          "value": null,
+          "expect": "f6"
+        }
+      ]
+    },
+    {
+      "id": "cbor-map-key-order",
+      "description": "键序为 (字节长度, 字节序) 严格递增（spec/core/02-编码.md §3.3）",
+      "items": [
+        {
+          "keys": [
+            "op",
+            "purpose",
+            "challenge",
+            "opVersion"
+          ]
+        },
+        {
+          "keys": [
+            "txid",
+            "vout",
+            "proven",
+            "script",
+            "satoshis"
+          ]
+        },
+        {
+          "keys": [
+            "state",
+            "language",
+            "deviceEph",
+            "publicKey",
+            "deviceNonce",
+            "deviceRunId"
+          ]
+        },
+        {
+          "keys": [
+            "saltHex",
+            "version",
+            "nonceHex",
+            "keySource",
+            "ciphertextHex"
+          ]
+        },
+        {
+          "keys": [
+            "op",
+            "rawTx",
+            "network",
+            "prevouts",
+            "opVersion",
+            "inputIndex"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cbor-nested-containers",
+      "description": "map 套 array 套 map 必须合法（修复 0002 §1 B1/B7：现有实现解析失败）",
+      "expect": "a6626f706d74782e7032706b682d7369676e657261775478450100000001676e6574776f726b0068707265766f75747381a564747869645820000000000000000000000000000000000000000000000000000000000000000064766f7574006670726f76656ef466736372697074581900000000000000000000000000000000000000000000000000687361746f736869731a000186a0696f7056657273696f6e016a696e707574496e64657800",
+      "decode": "roundtrip"
+    },
+    {
+      "id": "cbor-pair-count-check",
+      "description": "编码器必须自校验声明的 map 对数（修复 0002 §1 B6）",
+      "expect": "a3626f70617866726561736f6e75706169722d636f756e742d73656c662d636865636b696f7056657273696f6e01",
+      "decode": "roundtrip"
+    }
+  ]
+}

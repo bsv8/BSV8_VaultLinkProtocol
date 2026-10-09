@@ -1,0 +1,53 @@
+{
+  "suite": "handshake",
+  "version": "0.1",
+  "specCore": "0.1",
+  "note": "共享秘密为固定材料；X25519 本身由 crypto/hkdf.json 的 RFC 7748 向量覆盖。",
+  "inputs": {
+    "publicKey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+    "hostNonce": "e49869ed88e06dfeaf27c1ec0a1a3da2ab88fede5f15aabf964c748aba118a34",
+    "deviceNonce": "eae2d42fe87993faabc1b80de07bece1aa242ee1f1e173e09ced89c1e2105e48",
+    "hostEphemeral": "10edcc6d0a48c6a1c4172613aca6679f48b7a6df77604d75a5e40916ab8d828b",
+    "deviceEphemeral": "917035d3e22eead7ef28b528d3a21bed5c8b78a6b3e112a252c10d71a51cb095",
+    "sharedSecret": "a65f7468546141e4a8fc1555d169fb5f22339ebcc29eddbbfb8f4e70de89e6c5",
+    "deviceRunId": 287454020,
+    "hostRunGeneration": 1432778632,
+    "walletGeneration": 2578103244,
+    "backendGeneration": 3723427584,
+    "challenge": "b8d562d3219f13640b0a82be8743f7a30299042f7ecfc247c181474d05039fce",
+    "sessionId": 168496141,
+    "sessionEpoch": 7
+  },
+  "domainLabels": {
+    "handshake": "vlp:handshake:v1",
+    "pairing": "vlp:link:pairing:v1",
+    "c2sKey": "vlp:link:c2s:key:v1",
+    "c2sNonce": "vlp:link:c2s:nonce:v1",
+    "s2cKey": "vlp:link:s2c:key:v1",
+    "s2cNonce": "vlp:link:s2c:nonce:v1",
+    "possession": "vlp:possession:v1"
+  },
+  "expected": {
+    "transcript": "151b00c64f38a9f162b5148708c80c47abb7ac9d009d2c799a2bf28328a0dde5",
+    "pairingCode": "363141",
+    "c2sKey": "45807860dce7c064eb4dec645b327c66e1d999c933e051abe58abca7095e7c1b",
+    "c2sBaseNonce": "789887d386c74f5d0904223e",
+    "s2cKey": "f1028926cf99bf37e4fc00c9775c1d9596b96d5956c88cbc8e7c967ca8f810ba",
+    "s2cBaseNonce": "fe40e310fe1edecefabf41d4",
+    "possessionStatementDigest": "2ea6e51b4a6577bfd89e29dcf1aa45de10f13f35fb9e460a1251236dad1221bc",
+    "directionKeysDiffer": true,
+    "directionNoncesDiffer": true
+  },
+  "negativeCases": [
+    {
+      "id": "handshake-neg-transcript-tamper",
+      "description": "改动任一 transcript 输入必须改变 transcript 与配对码",
+      "mutate": "walletGeneration"
+    },
+    {
+      "id": "handshake-neg-possession-domain",
+      "description": "用 identity 域标签构造持有权声明必须得到不同摘要",
+      "expectError": "digest-differs"
+    }
+  ]
+}

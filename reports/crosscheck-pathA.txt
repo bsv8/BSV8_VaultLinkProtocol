@@ -1,0 +1,121 @@
+manifest 与文件哈希
+  PASS hash cbor/cbor.json
+  PASS hash cbor/negative.json
+  PASS hash frame/frame.json
+  PASS hash handshake/handshake.json
+  PASS hash commitment/commitment.json
+  PASS hash crypto/crypto.json
+  PASS hash profiles/bsv-p2pkh.json
+  PASS hash limits/frame-capacity.json
+  PASS hash policy/scope.json
+  PASS hash profiles/envelope.json
+  PASS 两端 commit 已固定
+  PASS evidence 标记未冻结
+
+编码（路径 A 独立重算 CBOR 向量）
+  PASS uint(0)
+  PASS uint(1)
+  PASS uint(23)
+  PASS uint(24)
+  PASS uint(255)
+  PASS uint(256)
+  PASS uint(65535)
+  PASS uint(65536)
+  PASS uint(4294967295)
+  PASS uint(4294967296)
+  PASS int(-1)
+  PASS int(-24)
+  PASS int(-25)
+  PASS int(-1000)
+  PASS 键序 5 组
+  PASS 嵌套容器逐字节一致 — a6626f706d74782e7032706b682d7369…
+
+编码负向量（路径 A 也必须拒绝）
+  PASS neg cbor-neg-missing-field — map-pair-count-mismatch
+  PASS neg cbor-neg-out-of-order — key-out-of-order
+  PASS neg cbor-neg-byte-order-descending — key-out-of-order
+  PASS neg cbor-neg-duplicate-key — duplicate-key
+  PASS neg cbor-neg-extra-key-past-declared — more-keys-than-declared
+  PASS neg cbor-neg-key-too-long — key-length-out-of-range
+  PASS neg cbor-neg-non-minimal-int — non-minimal-integer
+  PASS neg cbor-neg-non-minimal-length — non-minimal-integer
+  PASS neg cbor-neg-indefinite-length — forbidden-additional-info
+  PASS neg cbor-neg-tag — unexpected-major-type
+  PASS neg cbor-neg-float — forbidden-additional-info
+  PASS neg cbor-neg-undefined — unexpected-simple-value
+  PASS neg cbor-neg-bool-simple — unexpected-simple-value
+  PASS neg cbor-neg-trailing-bytes — trailing-bytes
+  PASS neg cbor-neg-depth-exceeded — depth-exceeded
+  PASS neg cbor-neg-declared-length-exceeds-input — declared-length-exceeds-input
+  PASS neg cbor-neg-bad-utf8-text — invalid-utf8
+  PASS neg cbor-neg-surrogate-utf8 — invalid-utf8
+  PASS neg cbor-neg-pairs-exceed-limit — map-pair-count-out-of-range
+  PASS neg cbor-neg-array-count-exceeds-input — declared-element-count-exceeds-input
+
+帧（路径 A 独立重算）
+  PASS frame-basic
+  PASS frame-max-payload 恰好上限被接受
+  PASS frame-aad
+  PASS crc32 校验值
+  PASS 限额与规范一致
+
+握手与派生（路径 A 独立重算）
+  PASS transcript
+  PASS 配对码 — 363141
+  PASS 派生 c2sKey
+  PASS 派生 c2sBaseNonce
+  PASS 派生 s2cKey
+  PASS 派生 s2cBaseNonce
+  PASS 方向分离
+  PASS 持有权声明摘要
+  PASS 域标签字节数与规范一致
+
+承诺（路径 A 独立重算）
+  PASS genericCommitment
+  PASS identityCommitment
+  PASS identity 承诺对象可独立重建
+  PASS prove/authorize 声明不同
+  PASS 内容声明与身份声明不同
+
+密码原语（路径 A 独立重算）
+  PASS HKDF A.1
+  PASS HKDF A.3
+  PASS local-secret 派生密钥 — 8b9534f16d1eec1714c3c5642652d3ef…
+  PASS 测试私钥是标量 1（大端 32 字节）
+  PASS local-secret AAD
+  PASS AAD 长度
+  PASS 信封 salt 只在 AAD 尾部
+  PASS HKDF salt 是固定串而非信封 salt
+
+BSV P2PKH（路径 A 独立重算）
+  PASS sighash
+  PASS sighashType
+  PASS 费用 — 15000
+  PASS 找零
+  PASS 付款总额
+  PASS 找零地址
+  PASS 收款明细
+  PASS 承诺
+  PASS 限额与规范一致
+
+容量实测（路径 A 复核）
+  PASS 限额一致
+  PASS 容量 cap-p2pkh-1in-2out — 289 字节
+  PASS 容量 cap-p2pkh-4in-6out — 855 字节
+  PASS 容量 cap-local-secret-512 — 661 字节
+  PASS 容量 cap-local-secret-4096-old — 4245 字节
+  PASS 容量 cap-channel-512-old — 629 字节
+  PASS 上限样本在限额内（收敛后的字段上限成立）
+
+授权范围（路径 A 复核）
+  PASS grantScope 变体互不相同
+  PASS grantScope 键序递增 — scope < direction < operation < protocolId < sessionEpoch < peerPublicKey
+  PASS 承诺逐请求唯一
+
+信封样本（结构层）
+  PASS 正样本覆盖的 op — content.attest-digest, identity.prove, local-secret.open, migration.import
+  PASS 负样本数量 — 14 项
+  PASS 负样本均声明期望原因
+  PASS 无 evidence 正样本（未冻结 Profile 不得出现）
+
+crosscheck: 全部通过

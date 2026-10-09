@@ -1,0 +1,96 @@
+{
+  "suite": "bsv-p2pkh",
+  "version": "0.1",
+  "sighashType": 65,
+  "limits": {
+    "maxInputs": 4,
+    "maxOutputs": 6,
+    "maxRawTxBytes": 640
+  },
+  "inputs": {
+    "publicKeyHex": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+    "scriptHex": "76a914751e76e8199196d454941c45d1b3a323f1433bd688ac",
+    "otherScriptHex": "76a914000102030405060708090a0b0c0d0e0f1011121388ac",
+    "changeAddress": "1BgGZ9tcN4rm9KBzDn7KprQz87SZ26SAMH",
+    "payAddress": "112D2adLM3UKy4Z4giRbReR6gjWuvHUqB",
+    "rawTxHex": "0000000001a6fe9ee6b4a4bac2e85c3c06ea3ee260bad07d4beacafea980df7b713112bc6a0000000000ffffffff02905f0100000000001976a914000102030405060708090a0b0c0d0e0f1011121388ac18730100000000001976a914751e76e8199196d454941c45d1b3a323f1433bd688ac00000000",
+    "prevouts": [
+      {
+        "txid": "a6fe9ee6b4a4bac2e85c3c06ea3ee260bad07d4beacafea980df7b713112bc6a",
+        "vout": 0,
+        "satoshis": 200000,
+        "script": "76a914751e76e8199196d454941c45d1b3a323f1433bd688ac",
+        "proven": false
+      }
+    ],
+    "inputIndex": 0
+  },
+  "expected": {
+    "sighashHex": "261b78c2c306a7c806fc02b5917dfdf578d2be09d52ccfbbe35101c2c7468a96",
+    "sighashType": 65,
+    "feeSats": 15000,
+    "changeSats": 95000,
+    "payTotalSats": 90000,
+    "changeAddress": "1BgGZ9tcN4rm9KBzDn7KprQz87SZ26SAMH",
+    "pays": [
+      {
+        "satoshis": 90000,
+        "address": "112D2adLM3UKy4Z4giRbReR6gjWuvHUqB"
+      }
+    ],
+    "commitmentHex": "d200a5ebb86db48ecd8d5f2aa825a392475088ea81462ac5f8dc6dad9bc2af56",
+    "commitObjectHex": "a465726177547858770000000001a6fe9ee6b4a4bac2e85c3c06ea3ee260bad07d4beacafea980df7b713112bc6a0000000000ffffffff02905f0100000000001976a914000102030405060708090a0b0c0d0e0f1011121388ac18730100000000001976a914751e76e8199196d454941c45d1b3a323f1433bd688ac00000000676e6574776f726b0068707265766f75747381a464747869645820a6fe9ee6b4a4bac2e85c3c06ea3ee260bad07d4beacafea980df7b713112bc6a64766f75740066736372697074581976a914751e76e8199196d454941c45d1b3a323f1433bd688ac687361746f736869731a00030d406a696e707574496e64657800"
+  },
+  "negativeCases": [
+    {
+      "id": "p2pkh-neg-not-owned",
+      "description": "前序不属于本 Key",
+      "expectError": "wrong-key"
+    },
+    {
+      "id": "p2pkh-neg-missing-evidence",
+      "description": "缺前序证据",
+      "expectError": "invalid-request"
+    },
+    {
+      "id": "p2pkh-neg-network",
+      "description": "非 0 网络",
+      "expectError": "invalid-request"
+    },
+    {
+      "id": "p2pkh-neg-no-change",
+      "description": "无找零输出",
+      "expectError": "invalid-request"
+    },
+    {
+      "id": "p2pkh-neg-no-pay",
+      "description": "无付款输出",
+      "expectError": "invalid-request"
+    },
+    {
+      "id": "p2pkh-neg-unknown-script",
+      "description": "非 P2PKH 输出脚本",
+      "expectError": "invalid-request"
+    },
+    {
+      "id": "p2pkh-neg-trailing",
+      "description": "rawTx 尾随字节",
+      "expectError": "invalid-request"
+    },
+    {
+      "id": "p2pkh-neg-input-index",
+      "description": "inputIndex 越界",
+      "expectError": "invalid-request"
+    },
+    {
+      "id": "p2pkh-neg-amount-tamper",
+      "description": "改金额保留旧承诺",
+      "expectError": "commitment-differs"
+    },
+    {
+      "id": "p2pkh-neg-recipient-tamper",
+      "description": "换收款方保留旧承诺",
+      "expectError": "commitment-differs"
+    }
+  ]
+}

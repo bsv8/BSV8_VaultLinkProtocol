@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vaultlink.invalid/schemas/vlp/0.1/channel.schema.json",
+  "title": "VLP 0.1 Channel Profile 请求",
+  "description": "结构性检查。Channel 的 wire 与摘要规则以 bsv8-channel-protocol@0.6.0 为准（spec/profiles/03-channel.md），本 schema 只检查字段结构，不检查 JCS 摘要是否正确。",
+  "type": "object",
+  "required": ["op", "opVersion", "protocol"],
+  "additionalProperties": false,
+  "properties": {
+    "op": {
+      "type": "string",
+      "enum": [
+        "channel.public-message",
+        "channel.hash-request",
+        "channel.private-message",
+        "channel.seal",
+        "channel.open"
+      ]
+      "description": "op 必须与下面对应的分支一致。"
+    },
+    "opVersion": { "const": 1 },
+    "channel": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "BSV8 channel 名；非空、不为 '*'、无控制字符。"
+    },
+    "protocol": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]{1,31}$",
+      "description": "必须是已登记协议名。未登记直接拒绝，不降级为「无协议」。"
+    },
+    "peerPublicKey": { "$ref": "#/$defs/pubkey" },
+    "message": {
+      "type": "string",
+      "pattern": "^[0-9a-f]+$",
+      "description": "BSV8 消息体字节，上限受单帧 896 字节约束。"
+    },
+    "sealed": {
+      "type": "string",
+      "pattern": "^[0-9a-f]+$",
+      "description": "BSV8 私密信封字节（ciphertext ‖ tag）。"
+    },
+    "nonce": {
+      "type": "string",
+      "pattern": "^[0-9a-f]+$",
+      "description": "密封信封的 base64url nonce 文本（16 字符）。"
+    }
+  },
+  "allOf": [
+    {
+      "$comment": "seal：只接受 recipientPub，不接受 senderPub",
+      "if": {
+        "properties": {
+          "op": {
+            "enum": ["channel.seal", "channel.public-message", "channel.hash-request"]
+          }
+        },
+        "required": ["op"]
+      },
+      "then": { "not": { "required": ["senderPublicKey"] } }
+    },
+    {
+      "$comment": "open：只接受 senderPub",
+      "if": { "properties": { "op": { "const": "channel.open" } }, "required": ["op"] },
+      "then": { "required": ["peerPublicKey", "sealed"] }
+    }
+  ],
+  "$defs": {
+    "pubkey": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{66}$",
+      "description": "BSV8 公钥：66 字符小写 hex。"
+    }
+  }
+}

@@ -1,0 +1,292 @@
+{
+  "suite": "envelope",
+  "version": "0.1",
+  "schema": "schemas/envelope.schema.json",
+  "note": "结构层负向量在 cbor/negative.json；此处为业务层负向样本，由 schemas/envelope.schema.json 校验。schema 只检查结构，不代表请求会被接受（spec/profiles/00-通用约定.md §7）。",
+  "positive": [
+    {
+      "id": "env-pos-identity-prove",
+      "document": {
+        "op": "identity.prove",
+        "opVersion": 1,
+        "challenge": "abababababababababababababababababababababababababababababababab",
+        "purpose": "vaultlink-test"
+      }
+    },
+    {
+      "id": "env-pos-local-secret-open",
+      "document": {
+        "op": "local-secret.open",
+        "opVersion": 1,
+        "scope": "storage.bucket-password",
+        "sealed": {
+          "saltHex": "00000000000000000000000000000000",
+          "version": 3,
+          "nonceHex": "101010101010101010101010",
+          "keySource": "active-key-hkdf-v1",
+          "ciphertextHex": "abababababababababababababababababababababababababababababababab"
+        }
+      }
+    },
+    {
+      "id": "env-pos-content-attest",
+      "document": {
+        "op": "content.attest-digest",
+        "opVersion": 1,
+        "digestHex": "cdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+        "fileName": "sample.bin",
+        "purpose": "archive"
+      }
+    },
+    {
+      "id": "env-pos-migration-import",
+      "document": {
+        "op": "migration.import",
+        "opVersion": 1,
+        "privKey": "0000000000000000000000000000000000000000000000000000000000000001",
+        "commitment": "efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef"
+      }
+    }
+  ],
+  "negative": [
+    {
+      "id": "env-neg-missing-challenge",
+      "description": "identity.prove 缺 challenge（现有实现缺失仍视为有效请求）",
+      "document": {
+        "op": "identity.prove",
+        "opVersion": 1,
+        "purpose": "p"
+      },
+      "expectError": "required-field-missing"
+    },
+    {
+      "id": "env-neg-missing-purpose",
+      "description": "identity.prove 缺 purpose",
+      "document": {
+        "op": "identity.prove",
+        "opVersion": 1,
+        "challenge": "abababababababababababababababababababababababababababababababab"
+      },
+      "expectError": "required-field-missing"
+    },
+    {
+      "id": "env-neg-unknown-field",
+      "description": "夹带降级字段",
+      "document": {
+        "op": "identity.prove",
+        "opVersion": 1,
+        "challenge": "abababababababababababababababababababababababababababababababab",
+        "purpose": "p",
+        "legacyFallback": 1
+      },
+      "expectError": "unknown-field"
+    },
+    {
+      "id": "env-neg-op-version",
+      "description": "opVersion 不受支持",
+      "document": {
+        "op": "identity.prove",
+        "opVersion": 99,
+        "challenge": "abababababababababababababababababababababababababababababababab",
+        "purpose": "p"
+      },
+      "expectError": "op-version-unsupported"
+    },
+    {
+      "id": "env-neg-challenge-length",
+      "description": "challenge 不是 32 字节",
+      "document": {
+        "op": "identity.prove",
+        "opVersion": 1,
+        "challenge": "abababababababababababababababab",
+        "purpose": "p"
+      },
+      "expectError": "length-out-of-range"
+    },
+    {
+      "id": "env-neg-challenge-uppercase-hex",
+      "description": "hex 必须小写",
+      "document": {
+        "op": "identity.prove",
+        "opVersion": 1,
+        "challenge": "ABABABABABABABABABABABABABABABABABABABABABABABABABABABABABABABAB",
+        "purpose": "p"
+      },
+      "expectError": "format-invalid"
+    },
+    {
+      "id": "env-neg-sealed-extra-field",
+      "description": "sealed 多一个字段（旧实现接受 4 对，导致自封数据解不开）",
+      "document": {
+        "op": "local-secret.open",
+        "opVersion": 1,
+        "scope": "s",
+        "sealed": {
+          "saltHex": "00000000000000000000000000000000",
+          "version": 3,
+          "nonceHex": "101010101010101010101010",
+          "keySource": "active-key-hkdf-v1",
+          "ciphertextHex": "abababababababababababababababababababababababababababababababab",
+          "extra": 1
+        }
+      },
+      "expectError": "unknown-field"
+    },
+    {
+      "id": "env-neg-sealed-version",
+      "description": "信封 version != 3",
+      "document": {
+        "op": "local-secret.open",
+        "opVersion": 1,
+        "scope": "s",
+        "sealed": {
+          "saltHex": "00000000000000000000000000000000",
+          "version": 2,
+          "nonceHex": "101010101010101010101010",
+          "keySource": "active-key-hkdf-v1",
+          "ciphertextHex": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "expectError": "envelope-version-unsupported"
+    },
+    {
+      "id": "env-neg-sealed-keysource",
+      "description": "keySource 不是 active-key-hkdf-v1",
+      "document": {
+        "op": "local-secret.open",
+        "opVersion": 1,
+        "scope": "s",
+        "sealed": {
+          "saltHex": "00000000000000000000000000000000",
+          "version": 3,
+          "nonceHex": "101010101010101010101010",
+          "keySource": "pin-derived-v2",
+          "ciphertextHex": "abababababababababababababababababababababababababababababababab"
+        }
+      },
+      "expectError": "key-source-unsupported"
+    },
+    {
+      "id": "env-neg-scope-control-char",
+      "description": "scope 含控制字符",
+      "document": {
+        "op": "local-secret.seal",
+        "opVersion": 1,
+        "scope": "bad\u0007scope",
+        "plaintext": "abababababababab"
+      },
+      "expectError": "format-invalid"
+    },
+    {
+      "id": "env-neg-p2pkh-missing-inputindex",
+      "description": "tx.p2pkh-sign 缺 inputIndex（现有实现静默签第 0 个输入）",
+      "document": {
+        "op": "tx.p2pkh-sign",
+        "opVersion": 1,
+        "rawTx": "01000000",
+        "network": 0,
+        "prevouts": [
+          {
+            "txid": "0000000000000000000000000000000000000000000000000000000000000000",
+            "vout": 0,
+            "proven": false,
+            "script": "76a914751e76e8199196d454941c45d1b3a323f1433bd688acac",
+            "satoshis": 1000
+          }
+        ]
+      },
+      "expectError": "required-field-missing"
+    },
+    {
+      "id": "env-neg-p2pkh-network",
+      "description": "非 BSV mainnet",
+      "document": {
+        "op": "tx.p2pkh-sign",
+        "opVersion": 1,
+        "rawTx": "01000000",
+        "network": 1,
+        "prevouts": [
+          {
+            "txid": "0000000000000000000000000000000000000000000000000000000000000000",
+            "vout": 0,
+            "proven": false,
+            "script": "76a914751e76e8199196d454941c45d1b3a323f1433bd688acac",
+            "satoshis": 1000
+          }
+        ],
+        "inputIndex": 0
+      },
+      "expectError": "network-unsupported"
+    },
+    {
+      "id": "env-neg-p2pkh-non-p2pkh-script",
+      "description": "前序脚本不是标准 P2PKH",
+      "document": {
+        "op": "tx.p2pkh-sign",
+        "opVersion": 1,
+        "rawTx": "01000000",
+        "network": 0,
+        "prevouts": [
+          {
+            "txid": "0000000000000000000000000000000000000000000000000000000000000000",
+            "vout": 0,
+            "proven": false,
+            "script": "a914000000000000000000000000000000000000000087",
+            "satoshis": 1000
+          }
+        ],
+        "inputIndex": 0
+      },
+      "expectError": "script-template-unsupported"
+    },
+    {
+      "id": "env-neg-p2pkh-inputs-over-limit",
+      "description": "前序数量超上限 4",
+      "document": {
+        "op": "tx.p2pkh-sign",
+        "opVersion": 1,
+        "rawTx": "01000000",
+        "network": 0,
+        "prevouts": [
+          {
+            "txid": "0000000000000000000000000000000000000000000000000000000000000000",
+            "vout": 0,
+            "proven": false,
+            "script": "76a914751e76e8199196d454941c45d1b3a323f1433bd688acac",
+            "satoshis": 1000
+          },
+          {
+            "txid": "0000000000000000000000000000000000000000000000000000000000000000",
+            "vout": 1,
+            "proven": false,
+            "script": "76a914751e76e8199196d454941c45d1b3a323f1433bd688acac",
+            "satoshis": 1000
+          },
+          {
+            "txid": "0000000000000000000000000000000000000000000000000000000000000000",
+            "vout": 2,
+            "proven": false,
+            "script": "76a914751e76e8199196d454941c45d1b3a323f1433bd688acac",
+            "satoshis": 1000
+          },
+          {
+            "txid": "0000000000000000000000000000000000000000000000000000000000000000",
+            "vout": 3,
+            "proven": false,
+            "script": "76a914751e76e8199196d454941c45d1b3a323f1433bd688acac",
+            "satoshis": 1000
+          },
+          {
+            "txid": "0000000000000000000000000000000000000000000000000000000000000000",
+            "vout": 4,
+            "proven": false,
+            "script": "76a914751e76e8199196d454941c45d1b3a323f1433bd688acac",
+            "satoshis": 1000
+          }
+        ],
+        "inputIndex": 0
+      },
+      "expectError": "count-out-of-range"
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "name": "@vaultlink/sdk",
+  "version": "0.2.0-draft.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "integration:serve": "node integration/web/server.mjs",
+    "integration:native": "npm run build && node integration/native/production-gate.mjs && node integration/native/build.mjs && node integration/native/run.mjs",
+    "integration:page": "playwright test -c integration/runner/playwright.config.mjs page.spec.mjs",
+    "integration:hardware": "node integration/runner/hardware.mjs",
+    "integration:policy": "node integration/runner/policy.mjs",
+    "integration:firmware": "node integration/runner/firmware.mjs",
+    "integration:prepare": "node integration/runner/bootstrap.mjs",
+    "integration:flash-test": "node integration/runner/hardware.mjs --flash",
+    "integration:vendor": "node integration/runner/verify-vendor.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.0",
+    "esbuild": "0.28.2",
+    "prettier": "3.6.2",
+    "typescript": "5.9.3"
+  },
+  "dependencies": {
+    "@noble/curves": "1.9.7"
+  }
+}

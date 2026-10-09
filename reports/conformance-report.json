@@ -1,0 +1,707 @@
+{
+  "runner": "conformance/run.js",
+  "path": "B",
+  "language": "nodejs",
+  "nodeVersion": "v22.17.0",
+  "limits": {
+    "maxFramePayload": 1024,
+    "maxMessage": 896,
+    "frameHeaderLen": 11,
+    "frameTrailerLen": 4,
+    "maxDepth": 6,
+    "maxKeyLen": 31,
+    "maxTopPairs": 24
+  },
+  "counts": {
+    "passed": 110,
+    "failed": 0,
+    "skipped": 0,
+    "unsupported": 4
+  },
+  "results": [
+    {
+      "id": "cbor:int-shortest",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "10 项"
+    },
+    {
+      "id": "cbor:int-negative",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "4 项"
+    },
+    {
+      "id": "cbor:simple-values",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "false/true/null"
+    },
+    {
+      "id": "cbor:key-order-accepted",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "5 组键序"
+    },
+    {
+      "id": "cbor:nested-containers",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "map⊂array⊂map 逐字节一致且可往返"
+    },
+    {
+      "id": "cbor:pair-count-self-check",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "B6 修复已生效"
+    },
+    {
+      "id": "cbor:neg:cbor-neg-missing-field",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "declared length exceeds remaining input (期望 map-pair-count-mismatch)"
+    },
+    {
+      "id": "cbor:neg:cbor-neg-out-of-order",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "key out of order or duplicated: a (期望 key-out-of-order)"
+    },
+    {
+      "id": "cbor:neg:cbor-neg-byte-order-descending",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "key out of order or duplicated: a (期望 key-out-of-order)"
+    },
+    {
+      "id": "cbor:neg:cbor-neg-duplicate-key",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "key out of order or duplicated: a (期望 duplicate-key)"
+    },
+    {
+      "id": "cbor:neg:cbor-neg-extra-key-past-declared",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "unexpected-simple-value (期望 more-keys-than-declared)"
+    },
+    {
+      "id": "cbor:neg:cbor-neg-key-too-long",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "key length out of range (期望 key-length-out-of-range)"
+    },
+    {
+      "id": "cbor:neg:cbor-neg-non-minimal-int",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "non-minimal integer head (期望 non-minimal-integer)"
+    },
+    {
+      "id": "cbor:neg:cbor-neg-non-minimal-length",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "non-minimal integer head (期望 non-minimal-integer)"
+    },
+    {
+      "id": "cbor:neg:cbor-neg-indefinite-length",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "forbidden additional info 31 (期望 forbidden-additional-info)"
+    },
+    {
+      "id": "cbor:neg:cbor-neg-tag",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "expected unsigned int, got major 6 (期望 unexpected-major-type)"
+    },
+    {
+      "id": "cbor:neg:cbor-neg-float",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "expected unsigned int, got major 7 (期望 forbidden-additional-info)"
+    },
+    {
+      "id": "cbor:neg:cbor-neg-undefined",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "unexpected-simple-value (期望 unexpected-simple-value)"
+    },
+    {
+      "id": "cbor:neg:cbor-neg-bool-simple",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "unexpected-simple-value (期望 unexpected-simple-value)"
+    },
+    {
+      "id": "cbor:neg:cbor-neg-trailing-bytes",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "expected map, got major 0 (期望 trailing-bytes)"
+    },
+    {
+      "id": "cbor:neg:cbor-neg-depth-exceeded",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "depth exceeds 6 (期望 depth-exceeded)"
+    },
+    {
+      "id": "cbor:neg:cbor-neg-declared-length-exceeds-input",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "declared length exceeds remaining input (期望 declared-length-exceeds-input)"
+    },
+    {
+      "id": "cbor:neg:cbor-neg-bad-utf8-text",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "invalid-utf8 (期望 invalid-utf8)"
+    },
+    {
+      "id": "cbor:neg:cbor-neg-surrogate-utf8",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "invalid-utf8 (期望 invalid-utf8)"
+    },
+    {
+      "id": "cbor:neg:cbor-neg-pairs-exceed-limit",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "declared pair count exceeds remaining input (期望 map-pair-count-out-of-range)"
+    },
+    {
+      "id": "cbor:neg:cbor-neg-array-count-exceeds-input",
+      "layer": "encoding",
+      "status": "passed",
+      "detail": "non-minimal integer head (期望 declared-element-count-exceeds-input)"
+    },
+    {
+      "id": "frame:basic",
+      "layer": "transport",
+      "status": "passed",
+      "detail": "32 字节"
+    },
+    {
+      "id": "frame:max-payload-exact",
+      "layer": "transport",
+      "status": "passed",
+      "detail": "1024 字节负载被接受（S2 修复）"
+    },
+    {
+      "id": "frame:aad",
+      "layer": "transport",
+      "status": "passed",
+      "detail": "10 字节，大端"
+    },
+    {
+      "id": "frame:crc32",
+      "layer": "transport",
+      "status": "passed",
+      "detail": "CRC-32/ISO-HDLC 两条路径一致"
+    },
+    {
+      "id": "frame:fragmentation-byte-at-a-time",
+      "layer": "transport",
+      "status": "passed",
+      "detail": "断包恢复"
+    },
+    {
+      "id": "frame:coalesced",
+      "layer": "transport",
+      "status": "passed",
+      "detail": "粘包恢复"
+    },
+    {
+      "id": "frame:resync-after-noise",
+      "layer": "transport",
+      "status": "passed",
+      "detail": "噪声前缀后完整帧不丢失"
+    },
+    {
+      "id": "frame:neg:frame-neg-magic",
+      "layer": "transport",
+      "status": "passed",
+      "detail": "bad-magic · dropped=0 resyncs=32"
+    },
+    {
+      "id": "frame:neg:frame-neg-version",
+      "layer": "transport",
+      "status": "passed",
+      "detail": "bad-version · dropped=1 resyncs=1"
+    },
+    {
+      "id": "frame:neg:frame-neg-crc",
+      "layer": "transport",
+      "status": "passed",
+      "detail": "crc-mismatch · dropped=1 resyncs=1"
+    },
+    {
+      "id": "frame:neg:frame-neg-oversize-header-only",
+      "layer": "transport",
+      "status": "passed",
+      "detail": "payload-length-out-of-range · dropped=1 resyncs=1"
+    },
+    {
+      "id": "frame:neg:frame-neg-reserved-flags",
+      "layer": "transport",
+      "status": "passed",
+      "detail": "reserved flag bits set"
+    },
+    {
+      "id": "handshake:transcript",
+      "layer": "link",
+      "status": "passed",
+      "detail": "194 字节输入，单次 SHA-256"
+    },
+    {
+      "id": "handshake:pairing-code",
+      "layer": "link",
+      "status": "passed",
+      "detail": "363141"
+    },
+    {
+      "id": "handshake:direction-key-derivation",
+      "layer": "link",
+      "status": "passed",
+      "detail": "HKDF 4 项一致，方向分离"
+    },
+    {
+      "id": "handshake:possession-statement",
+      "layer": "link",
+      "status": "passed",
+      "detail": "95 字节输入，SHA256d"
+    },
+    {
+      "id": "handshake:transcript-tamper-changes-code",
+      "layer": "link",
+      "status": "passed",
+      "detail": "世代绑定生效"
+    },
+    {
+      "id": "handshake:domain-isolation",
+      "layer": "link",
+      "status": "passed",
+      "detail": "跨用途不可复用"
+    },
+    {
+      "id": "commitment:generic",
+      "layer": "core",
+      "status": "passed",
+      "detail": "4eca4522129c3acc…"
+    },
+    {
+      "id": "commitment:identity",
+      "layer": "core",
+      "status": "passed",
+      "detail": "路径 B 独立重建 commitObject 并复算承诺"
+    },
+    {
+      "id": "commitment:tamper-changes-value",
+      "layer": "core",
+      "status": "passed",
+      "detail": "承诺对输入敏感"
+    },
+    {
+      "id": "commitment:profile-must-not-cross",
+      "layer": "core",
+      "status": "passed",
+      "detail": "profileId 进承诺"
+    },
+    {
+      "id": "commitment:version-must-not-cross",
+      "layer": "core",
+      "status": "passed",
+      "detail": "profileVersion 进承诺"
+    },
+    {
+      "id": "identity:statement-domains-differ",
+      "layer": "core",
+      "status": "passed",
+      "detail": "用途域隔离"
+    },
+    {
+      "id": "crypto:hkdf-rfc5869-a1",
+      "layer": "crypto",
+      "status": "passed",
+      "detail": "RFC 5869 A.1"
+    },
+    {
+      "id": "crypto:hkdf-rfc5869-a3",
+      "layer": "crypto",
+      "status": "passed",
+      "detail": "RFC 5869 A.3（空 salt/info）"
+    },
+    {
+      "id": "crypto:hmac-rfc4231-case2",
+      "layer": "crypto",
+      "status": "passed",
+      "detail": "RFC 4231 case 2"
+    },
+    {
+      "id": "crypto:sha256-known-answers",
+      "layer": "crypto",
+      "status": "passed",
+      "detail": "FIPS 180-4"
+    },
+    {
+      "id": "crypto:ripemd160-known-answers",
+      "layer": "crypto",
+      "status": "passed",
+      "detail": "ISO/IEC 10118-3"
+    },
+    {
+      "id": "crypto:local-secret-v3-derivation",
+      "layer": "crypto",
+      "status": "passed",
+      "detail": "既有 v3 配方逐字节一致"
+    },
+    {
+      "id": "crypto:local-secret-aad",
+      "layer": "crypto",
+      "status": "passed",
+      "detail": "66 字节，salt 仅在 AAD"
+    },
+    {
+      "id": "crypto:local-secret-aead-roundtrip",
+      "layer": "crypto",
+      "status": "passed",
+      "detail": "AES-256-GCM 往返"
+    },
+    {
+      "id": "crypto:local-secret-neg-scope-change",
+      "layer": "crypto",
+      "status": "passed",
+      "detail": "换 scope 必须失败"
+    },
+    {
+      "id": "crypto:local-secret-neg-aad-order",
+      "layer": "crypto",
+      "status": "passed",
+      "detail": "AAD 改动必须失败"
+    },
+    {
+      "id": "crypto:local-secret-neg-hkdf-salt-confusion",
+      "layer": "crypto",
+      "status": "passed",
+      "detail": "信封 salt ≠ HKDF salt（X 项易错点）"
+    },
+    {
+      "id": "crypto:x25519-rfc7748-vector",
+      "layer": "crypto",
+      "status": "passed",
+      "detail": "RFC 7748 §6.1（Node 成熟实现实际执行）"
+    },
+    {
+      "id": "crypto:aes256gcm-nist-vector",
+      "layer": "crypto",
+      "status": "passed",
+      "detail": "NIST SP 800-38D TC16"
+    },
+    {
+      "id": "crypto:aes256gcm-tamper-rejected",
+      "layer": "crypto",
+      "status": "passed",
+      "detail": "篡改必须失败"
+    },
+    {
+      "id": "crypto:ecdsa-verify-rejects-wrong-key",
+      "layer": "crypto",
+      "status": "passed",
+      "detail": "验签路径实际执行（用真实签名，非替身）"
+    },
+    {
+      "id": "p2pkh:capacity-in-limits",
+      "layer": "profile",
+      "status": "passed",
+      "detail": "in≤4 out≤6 rawTx≤640"
+    },
+    {
+      "id": "p2pkh:address-base58check",
+      "layer": "profile",
+      "status": "passed",
+      "detail": "1BgGZ9tcN4rm9KBzDn7KprQz87SZ26SAMH"
+    },
+    {
+      "id": "p2pkh:sighash-stable-in-both-paths",
+      "layer": "profile",
+      "status": "passed",
+      "detail": "向量携带设备自算 sighash；BIP143 实现属 V2/V5 范围"
+    },
+    {
+      "id": "p2pkh:script-template-strict",
+      "layer": "profile",
+      "status": "passed",
+      "detail": "仅接受标准 P2PKH"
+    },
+    {
+      "id": "p2pkh:commitment-covers-amount",
+      "layer": "profile",
+      "status": "passed",
+      "detail": "承诺覆盖 rawTx/network/prevouts/inputIndex"
+    },
+    {
+      "id": "p2pkh:proven-not-in-commitment",
+      "layer": "profile",
+      "status": "passed",
+      "detail": "键 rawTx,network,prevouts,txid,vout,script,satoshis,inputIndex；proven 不进承诺"
+    },
+    {
+      "id": "limits:single-frame-no-fragmentation",
+      "layer": "limits",
+      "status": "passed",
+      "detail": "帧 1024 / 明文 1008 / 业务 896"
+    },
+    {
+      "id": "limits:cap-p2pkh-1in-2out",
+      "layer": "limits",
+      "status": "passed",
+      "detail": "289 字节 · 单帧可容纳"
+    },
+    {
+      "id": "limits:cap-p2pkh-4in-6out",
+      "layer": "limits",
+      "status": "passed",
+      "detail": "855 字节 · 单帧可容纳"
+    },
+    {
+      "id": "limits:cap-local-secret-512",
+      "layer": "limits",
+      "status": "passed",
+      "detail": "661 字节 · 单帧可容纳"
+    },
+    {
+      "id": "limits:cap-local-secret-4096-old",
+      "layer": "limits",
+      "status": "passed",
+      "detail": "4245 字节 · 超限拒绝"
+    },
+    {
+      "id": "limits:cap-channel-512-old",
+      "layer": "limits",
+      "status": "passed",
+      "detail": "629 字节 · 单帧可容纳"
+    },
+    {
+      "id": "limits:oversize-rejected",
+      "layer": "limits",
+      "status": "passed",
+      "detail": "超限明确拒绝，不截断"
+    },
+    {
+      "id": "scope:canonical-key-order",
+      "layer": "policy",
+      "status": "passed",
+      "detail": "scope < direction < operation < protocolId < sessionEpoch < peerPublicKey"
+    },
+    {
+      "id": "scope:variants-differ",
+      "layer": "policy",
+      "status": "passed",
+      "detail": "换 scope/对端/协议/方向都改变 grantScope"
+    },
+    {
+      "id": "scope:commitment-is-per-request",
+      "layer": "policy",
+      "status": "passed",
+      "detail": "承诺逐请求唯一（B2 修复的核心）"
+    },
+    {
+      "id": "schema:pos:env-pos-identity-prove",
+      "layer": "schema",
+      "status": "passed",
+      "detail": "正样本通过结构校验"
+    },
+    {
+      "id": "schema:pos:env-pos-local-secret-open",
+      "layer": "schema",
+      "status": "passed",
+      "detail": "正样本通过结构校验"
+    },
+    {
+      "id": "schema:pos:env-pos-content-attest",
+      "layer": "schema",
+      "status": "passed",
+      "detail": "正样本通过结构校验"
+    },
+    {
+      "id": "schema:pos:env-pos-migration-import",
+      "layer": "schema",
+      "status": "passed",
+      "detail": "正样本通过结构校验"
+    },
+    {
+      "id": "schema:neg:env-neg-missing-challenge",
+      "layer": "schema",
+      "status": "passed",
+      "detail": "oneOf 匹配 0 个分支（应为 1）: 缺少必填字段 challenge（期望 required-field-missing）"
+    },
+    {
+      "id": "schema:neg:env-neg-missing-purpose",
+      "layer": "schema",
+      "status": "passed",
+      "detail": "oneOf 匹配 0 个分支（应为 1）: 缺少必填字段 purpose（期望 required-field-missing）"
+    },
+    {
+      "id": "schema:neg:env-neg-unknown-field",
+      "layer": "schema",
+      "status": "passed",
+      "detail": "oneOf 匹配 0 个分支（应为 1）: 未知字段 legacyFallback（$）（期望 unknown-field）"
+    },
+    {
+      "id": "schema:neg:env-neg-op-version",
+      "layer": "schema",
+      "status": "passed",
+      "detail": "oneOf 匹配 0 个分支（应为 1）: const 不符：期望 1，实际 99（期望 op-version-unsupported）"
+    },
+    {
+      "id": "schema:neg:env-neg-challenge-length",
+      "layer": "schema",
+      "status": "passed",
+      "detail": "oneOf 匹配 0 个分支（应为 1）: 不匹配 pattern ^[0-9a-f]{64}$（期望 length-out-of-range）"
+    },
+    {
+      "id": "schema:neg:env-neg-challenge-uppercase-hex",
+      "layer": "schema",
+      "status": "passed",
+      "detail": "oneOf 匹配 0 个分支（应为 1）: 不匹配 pattern ^[0-9a-f]{64}$（期望 format-invalid）"
+    },
+    {
+      "id": "schema:neg:env-neg-sealed-extra-field",
+      "layer": "schema",
+      "status": "passed",
+      "detail": "oneOf 匹配 0 个分支（应为 1）: 未知字段 extra（$.sealed）（期望 unknown-field）"
+    },
+    {
+      "id": "schema:neg:env-neg-sealed-version",
+      "layer": "schema",
+      "status": "passed",
+      "detail": "oneOf 匹配 0 个分支（应为 1）: const 不符：期望 3，实际 2（期望 envelope-version-unsupported）"
+    },
+    {
+      "id": "schema:neg:env-neg-sealed-keysource",
+      "layer": "schema",
+      "status": "passed",
+      "detail": "oneOf 匹配 0 个分支（应为 1）: const 不符：期望 \"active-key-hkdf-v1\"，实际 \"pin-derived-v2\"（期望 key-source-unsupported）"
+    },
+    {
+      "id": "schema:neg:env-neg-scope-control-char",
+      "layer": "schema",
+      "status": "passed",
+      "detail": "oneOf 匹配 0 个分支（应为 1）: 不匹配 pattern ^[\\u0020-\\u007E\\u0080-\\uFFFF]+$（期望 format-invalid）"
+    },
+    {
+      "id": "schema:neg:env-neg-p2pkh-missing-inputindex",
+      "layer": "schema",
+      "status": "passed",
+      "detail": "oneOf 匹配 0 个分支（应为 1）: 缺少必填字段 inputIndex（期望 required-field-missing）"
+    },
+    {
+      "id": "schema:neg:env-neg-p2pkh-network",
+      "layer": "schema",
+      "status": "passed",
+      "detail": "oneOf 匹配 0 个分支（应为 1）: const 不符：期望 0，实际 1（期望 network-unsupported）"
+    },
+    {
+      "id": "schema:neg:env-neg-p2pkh-non-p2pkh-script",
+      "layer": "schema",
+      "status": "passed",
+      "detail": "oneOf 匹配 0 个分支（应为 1）: 不匹配 pattern ^76a914[0-9a-f]{40}88ac$（期望 script-template-unsupported）"
+    },
+    {
+      "id": "schema:neg:env-neg-p2pkh-inputs-over-limit",
+      "layer": "schema",
+      "status": "passed",
+      "detail": "oneOf 匹配 0 个分支（应为 1）: 元素过多（5 > 4）（期望 count-out-of-range）"
+    },
+    {
+      "id": "schema:limits-match-spec",
+      "layer": "schema",
+      "status": "passed",
+      "detail": "schema 上限与规范/向量一致"
+    },
+    {
+      "id": "schema:schema-covers-all-profiles",
+      "layer": "schema",
+      "status": "passed",
+      "detail": "7 个操作已覆盖；evidence 未声明"
+    },
+    {
+      "id": "manifest:file-hashes",
+      "layer": "manifest",
+      "status": "passed",
+      "detail": "10 个向量文件哈希一致"
+    },
+    {
+      "id": "manifest:source-commits-pinned",
+      "layer": "manifest",
+      "status": "passed",
+      "detail": "两端 commit 已固定"
+    },
+    {
+      "id": "manifest:unfrozen-profiles-marked",
+      "layer": "manifest",
+      "status": "passed",
+      "detail": "evidence 标记不可用"
+    },
+    {
+      "id": "manifest:no-secret-material",
+      "layer": "manifest",
+      "status": "passed",
+      "detail": "测试密钥为公开可复算的标量 1（00…00 01）"
+    },
+    {
+      "id": "coverage:no-fake-pass",
+      "layer": "coverage",
+      "status": "passed",
+      "detail": "105 项实际执行"
+    },
+    {
+      "id": "coverage:layers-reported",
+      "layer": "coverage",
+      "status": "passed",
+      "detail": "encoding → transport → link → core → crypto → profile → limits → policy → schema → manifest → coverage"
+    },
+    {
+      "id": "coverage:negative-vectors-present",
+      "layer": "coverage",
+      "status": "passed",
+      "detail": "39 项负向量已执行"
+    },
+    {
+      "id": "coverage:two-independent-paths",
+      "layer": "coverage",
+      "status": "passed",
+      "detail": "路径 A = tools/refgen/vlp_ref.py（Python 标准库）；路径 B = conformance/run.js（Node）"
+    },
+    {
+      "id": "unverified:sdk-typescript",
+      "layer": "not-started",
+      "status": "unsupported",
+      "detail": "V2–V8 范围，本轮未实施；工具/实现缺失不输出兼容通过"
+    },
+    {
+      "id": "unverified:sdk-device",
+      "layer": "not-started",
+      "status": "unsupported",
+      "detail": "V2–V8 范围，本轮未实施；工具/实现缺失不输出兼容通过"
+    },
+    {
+      "id": "unverified:usb-real-device",
+      "layer": "not-started",
+      "status": "unsupported",
+      "detail": "V2–V8 范围，本轮未实施；工具/实现缺失不输出兼容通过"
+    },
+    {
+      "id": "unverified:browser-real",
+      "layer": "not-started",
+      "status": "unsupported",
+      "detail": "V2–V8 范围，本轮未实施；工具/实现缺失不输出兼容通过"
+    },
+    {
+      "id": "coverage:not-yet-verifiable",
+      "layer": "coverage",
+      "status": "passed",
+      "detail": "4 个层次明确标记不可验证"
+    }
+  ]
+}

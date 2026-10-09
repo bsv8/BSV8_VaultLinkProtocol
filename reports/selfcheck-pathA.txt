@@ -1,0 +1,111 @@
+摘要原语
+  PASS CRC-32/ISO-HDLC 校验值
+  PASS CRC-32 空输入为 0
+  PASS SHA-256(abc)
+  PASS SHA256d(abc)
+  PASS RIPEMD-160(abc)
+  PASS HMAC-SHA256 RFC 4231 case 2
+  PASS HKDF RFC 5869 A.1
+  PASS HKDF RFC 5869 A.3（空 salt/info）
+
+整数最短表示
+  PASS uint(0) — 00
+  PASS uint(23) — 17
+  PASS uint(24) — 1818
+  PASS uint(255) — 18ff
+  PASS uint(256) — 190100
+  PASS uint(65535) — 19ffff
+  PASS uint(65536) — 1a00010000
+  PASS uint(4294967295) — 1affffffff
+  PASS uint(4294967296) — 1b0000000100000000
+  PASS int(-1) — 20
+  PASS int(-24) — 37
+  PASS int(-25) — 3818
+  PASS int(-1000) — 3903e7
+
+键序规则（长度优先再字节序）
+  PASS 递增键序被接受
+  PASS 乱序（长度变小） — key out of order or duplicated: a
+  PASS 等长字节序递减 — key out of order or duplicated: a
+  PASS 重复键 — key out of order or duplicated: a
+  PASS 键名 32 字节超限 — key length out of range: 32
+
+编码器自校验（B6 修复）
+  PASS 声明 3 对只写 1 对 — map pair count mismatch: wrote 1, declared 3
+  PASS 键数多于声明 — more keys than declared pairs
+  PASS 未闭合容器 — unclosed container
+  PASS 数组元素数不符 — array count mismatch: 1 elements left
+
+嵌套容器（B1/B7 修复：容器状态按层级栈）
+  PASS map 套 array 套 map 可编码 — 174 字节
+  PASS 嵌套结构可完整解码 — op,rawTx,network,prevouts,opVersion,inputIndex
+
+解码器严格性
+  PASS 非最短整数 — non-minimal integer head
+  PASS 非最短长度头 — non-minimal integer head
+  PASS 不定长 — forbidden additional info 31
+  PASS 标签 major 6 — expected unsigned int, got major 6
+  PASS 浮点 — expected unsigned int, got major 7
+  PASS undefined — forbidden simple value 0xF7
+  PASS 尾随字节 — expected map, got major 0
+  PASS 坏 UTF-8 — text string is not well-formed UTF-8
+  PASS 代理区码点 — text string is not well-formed UTF-8
+  PASS 深度超限 — array has 1 unread elements
+  PASS 声明长度超输入 — declared length exceeds remaining input
+  PASS 对数超上限 — declared pair count exceeds remaining input
+
+帧层
+  PASS 帧头 magic
+  PASS 帧总长 = 11 + L + 4
+  PASS 整帧往返
+  PASS 逐字节喂入（断包）
+  PASS 粘包一次取两帧
+  PASS 噪声前缀后恢复完整帧 — resyncs=4
+  PASS CRC 错误丢弃
+  PASS 仅凭头拒绝超长负载
+  PASS 恰好 MAX_FRAME_PAYLOAD 被接受
+  PASS 保留标志位 — reserved flag bits set: 0x08
+  PASS 负载超上限 — payload 1025 exceeds MAX_FRAME_PAYLOAD 1024
+  PASS AAD 10 字节且大端
+
+握手与派生
+  PASS transcript 域标签 16 字节
+  PASS 持有权域标签 17 字节
+  PASS 配对域标签 19 字节
+  PASS c2s/s2c 域标签不同
+  PASS 配对码恰好 6 位十进制 — 266699
+  PASS 方向密钥不同
+  PASS 方向 nonce 不同
+
+Local Secret v3
+  PASS 派生密钥为公开可复算值 — 8b9534f16d1eec1714c3c5642652d3eff0a9f7b72e5da4e9973d666e8b259112
+  PASS AAD 以信封 salt 结尾
+  PASS AAD 分隔符位置正确（prefix ‖ scope ‖ 0x00 ‖ salt） — 66 字节
+  PASS HKDF salt 是常量而非信封 salt
+  PASS scope 超 95 字节 — scope length 96 out of range 1..95
+  PASS scope 含控制字符 — scope contains control character
+  PASS 空 scope — scope length 0 out of range 1..95
+  PASS 信封 salt 非 16 字节 — envelope salt must be 16 bytes
+
+BSV P2PKH
+  PASS 测试公钥地址 — 1BgGZ9tcN4rm9KBzDn7KprQz87SZ26SAMH
+  PASS 交易可往返解析
+  PASS 费用为 15000 sat — 15000
+  PASS 找零金额 95000
+  PASS 付款总额 90000
+  PASS sighash 长度 32
+  PASS 前序不属于本 Key — signed input is not owned by this key
+  PASS inputIndex 越界 — inputIndex out of range
+  PASS 缺前序证据 — missing prevout evidence for input 0
+  PASS rawTx 尾随字节 — trailing bytes in rawTx
+  PASS 网络/版本非 0（仅 BSV mainnet） — network/version must be 0 (BSV mainnet)
+  PASS 无找零输出 — no change output owned by this key
+
+承诺与域隔离
+  PASS 承诺随输入变化
+  PASS profileId 进承诺
+  PASS profileVersion 进承诺
+  PASS prove/authorize 域隔离
+  PASS 持有权与身份声明域隔离
+
+selfcheck: 全部通过

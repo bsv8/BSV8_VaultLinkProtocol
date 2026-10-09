@@ -1,0 +1,139 @@
+{
+  "status": "passed",
+  "hardware": true,
+  "transport": "browser Web Serial → ESP32 USB-UART / NVS",
+  "protocolVersion": 2,
+  "deviceRunId": 8,
+  "results": [
+    {
+      "id": "E2E-01",
+      "name": "配对、持有权证明、加密往返与版本标识",
+      "status": "passed",
+      "durationMs": 816
+    },
+    {
+      "id": "E2E-02",
+      "name": "额度内真实 P2PKH 签名，输出计额不计矿工费",
+      "status": "passed",
+      "durationMs": 484
+    },
+    {
+      "id": "E2E-03",
+      "name": "同付款 ID 重放不签署、不重复扣数",
+      "status": "passed",
+      "durationMs": 145
+    },
+    {
+      "id": "E2E-04",
+      "name": "累计超额拒绝与仅批准本次",
+      "status": "passed",
+      "durationMs": 467
+    },
+    {
+      "id": "E2E-05",
+      "name": "提高当前累计额度，不改默认/单笔",
+      "status": "passed",
+      "durationMs": 327
+    },
+    {
+      "id": "E2E-06",
+      "name": "单笔等于额度免确认、超过额度拒绝",
+      "status": "passed",
+      "durationMs": 589
+    },
+    {
+      "id": "E2E-07",
+      "name": "App 跨渠道累计，换渠道不刷新额度",
+      "status": "passed",
+      "durationMs": 523
+    },
+    {
+      "id": "E2E-08",
+      "name": "交易证据和承诺篡改被拒绝",
+      "status": "passed",
+      "durationMs": 394
+    },
+    {
+      "id": "E2E-09",
+      "name": "等待批准期间查询和取消，不产生签名",
+      "status": "passed",
+      "durationMs": 529
+    },
+    {
+      "id": "E2E-10",
+      "name": "等待批准时单业务槽拒绝并发付款",
+      "status": "passed",
+      "durationMs": 465
+    },
+    {
+      "id": "E2E-11",
+      "name": "before-reserve 内部重启与恢复",
+      "status": "passed",
+      "durationMs": 7697
+    },
+    {
+      "id": "E2E-12",
+      "name": "after-reserve 内部重启与恢复",
+      "status": "passed",
+      "durationMs": 7582
+    },
+    {
+      "id": "E2E-13",
+      "name": "after-sign 内部重启与恢复",
+      "status": "passed",
+      "durationMs": 7494
+    },
+    {
+      "id": "E2E-14",
+      "name": "after-commit 内部重启与恢复",
+      "status": "passed",
+      "durationMs": 7542
+    },
+    {
+      "id": "E2E-15",
+      "name": "配置提交前重启保留旧配置",
+      "status": "passed",
+      "durationMs": 7239
+    },
+    {
+      "id": "E2E-16",
+      "name": "配置提交后重启恢复新配置",
+      "status": "passed",
+      "durationMs": 7475
+    },
+    {
+      "id": "E2E-17",
+      "name": "实际持久接口失败停止自动支付",
+      "status": "passed",
+      "durationMs": 3002
+    },
+    {
+      "id": "E2E-18",
+      "name": "未知操作明确拒绝",
+      "status": "passed",
+      "durationMs": 44
+    },
+    {
+      "id": "E2E-19",
+      "name": "真实加密记录篡改断链，不签名、不复活授权",
+      "status": "passed",
+      "durationMs": 7452
+    },
+    {
+      "id": "E2E-20",
+      "name": "错 Key 与拒绝配对不能建立可用会话",
+      "status": "passed",
+      "durationMs": 7637
+    }
+  ],
+  "browserVersion": "155.0.4283.45",
+  "browserChannel": "msedge",
+  "sdkVersion": "0.2.0-draft.1",
+  "timestamp": "2026-10-09T14:03:55.627Z",
+  "device": {
+    "serialPort": "/dev/cu.usbserial-02010546",
+    "vendorId": 4292,
+    "productId": 60000,
+    "buildTarget": "m5stack-e2e"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vaultlink.invalid/schemas/vlp/0.1/events.schema.json",
+  "title": "VLP 0.1 事件",
+  "description": "结构性检查。事件类型与字段依据 spec/core/03-帧与消息.md §7 与 spec/core/06-请求状态与事件.md §4。事件丢失不使撤权失效——本 schema 不表达该行为。",
+  "type": "object",
+  "required": ["payload", "eventSeq", "deviceRunId"],
+  "additionalProperties": false,
+  "properties": {
+    "payload": { "type": ["object", "null"] },
+    "eventSeq": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 4294967295,
+      "description": "运行世代内单调递增，从 1 开始。主机忽略更小的事件。"
+    },
+    "deviceRunId": { "type": "integer", "minimum": 1, "maximum": 4294967295 }
+  },
+  "$defs": {
+    "requestState": {
+      "type": "object",
+      "required": ["kind", "state", "requestId"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": 0 },
+        "state": { "type": "integer", "minimum": 0, "maximum": 8 },
+        "requestId": { "type": "integer", "minimum": 0, "maximum": 4294967295 }
+      }
+    },
+    "deviceState": {
+      "type": "object",
+      "required": ["kind", "sessionId", "deviceState"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": 1 },
+        "sessionId": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+        "deviceState": { "type": "integer", "minimum": 0, "maximum": 5 }
+      }
+    },
+    "authRevision": {
+      "type": "object",
+      "required": ["kind", "decisionRevision"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": 2 },
+        "decisionRevision": { "type": "integer", "minimum": 0, "maximum": 4294967295 }
+      }
+    },
+    "sessionClosed": {
+      "type": "object",
+      "required": ["kind", "reason", "sessionId"],
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "const": 3 },
+        "reason": { "type": "integer", "minimum": 0 },
+        "sessionId": { "type": "integer", "minimum": 0, "maximum": 4294967295 }
+      }
+    }
+  }
+}

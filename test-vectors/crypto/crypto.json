@@ -1,0 +1,69 @@
+{
+  "suite": "crypto",
+  "version": "0.1",
+  "specSecurity": "0.1",
+  "testKey": {
+    "note": "公开测试密钥：标量为 1，非任何真实密钥；无 PIN、无数据库。",
+    "privateKeyHex": "0000000000000000000000000000000000000000000000000000000000000001",
+    "publicKeyHex": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+  },
+  "hkdf": {
+    "rfc5869A1": {
+      "note": "RFC 5869 A.1（SHA-256，22 字节 IKM，13 字节 salt/info，42 字节 L）",
+      "ikmHex": "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b",
+      "saltHex": "000102030405060708090a0b0c",
+      "infoHex": "f0f1f2f3f4f5f6f7f8f9",
+      "okmHex": "3cb25f25faacd57a90434f64d0362f2a2d2d0a90cf1a5a4c5db02d56ecc4c5bf34007208d5b887185865"
+    },
+    "rfc5869A3": {
+      "note": "RFC 5869 A.3（空 salt 与 info，42 字节 L）",
+      "ikmHex": "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b",
+      "saltHex": "",
+      "infoHex": "",
+      "okmHex": "8da4e775a563c18f715f802a063c5a31b8a11f5c5ee1879ec3454e5f3c738d2d9d201395faa4b61a96c8"
+    }
+  },
+  "digests": {
+    "sha256Empty": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "sha256dEmpty": "5df6e0e2761359d30a8275058e299fcc0381534545f55cf43e41983f5d4c9456",
+    "sha256dAbc": "4f8b42c22dd3729b519ba6f68d2da7cc5b2d606d05daed5ad5128cc03e6c6358",
+    "ripemd160Empty": "9c1185a5c5e9fc54612808977ee8f548b2258d31",
+    "ripemd160Abc": "8eb208f7e05d987a9b044a8e98c6b087f15a0bfc",
+    "hash160OfTestPub": "751e76e8199196d454941c45d1b3a323f1433bd6"
+  },
+  "localSecretV3": {
+    "note": "既有 v3 配方的派生密钥与 AAD；信封 salt 只在 AAD 中，从不作为 HKDF salt（0002 §4 X 记录的最易错点）",
+    "keySource": "active-key-hkdf-v1",
+    "envelopeVersion": 3,
+    "hkdfSalt": "keymaster.vault.local-secret.v3",
+    "hkdfInfoHex": "3032373962653636376566396463626261633535613036323935636538373062303730323962666364623264636532386439353966323831356231366638313739380073746f726167652e6275636b65742d70617373776f7264",
+    "scope": "storage.bucket-password",
+    "derivedKeyHex": "8b9534f16d1eec1714c3c5642652d3eff0a9f7b72e5da4e9973d666e8b259112",
+    "saltHex": "000102030405060708090a0b0c0d0e0f",
+    "nonceHex": "101112131415161718191a1b",
+    "aadHex": "6b65796d61737465723a6c6f63616c2d7365637265743a76337c73746f726167652e6275636b65742d70617373776f726400000102030405060708090a0b0c0d0e0f",
+    "aadLength": 66
+  },
+  "negativeCases": [
+    {
+      "id": "crypto-neg-scope-change",
+      "description": "换 scope 必须改变派生密钥",
+      "expectError": "key-differs"
+    },
+    {
+      "id": "crypto-neg-key-change",
+      "description": "换业务私钥必须改变派生密钥",
+      "expectError": "key-differs"
+    },
+    {
+      "id": "crypto-neg-salt-not-in-hkdf",
+      "description": "把信封 salt 当作 HKDF salt 必须解不开既有密文",
+      "expectError": "aead-failure"
+    },
+    {
+      "id": "crypto-neg-aad-order",
+      "description": "AAD 中 0x00 分隔符位置错误必须导致 AEAD 失败",
+      "expectError": "aead-failure"
+    }
+  ]
+}

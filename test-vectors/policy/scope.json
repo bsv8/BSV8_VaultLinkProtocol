@@ -1,0 +1,46 @@
+{
+  "suite": "scope",
+  "version": "0.1",
+  "note": "单次 requestCommitment 逐请求唯一；grantScope 多条合法请求可共用。两者分离是需求 §6 的要求（0002 §1 B2 的修复）。",
+  "peerA": "02c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+  "peerB": "0379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+  "grantScopeEncodingHex": "a66573636f706578196368616e6e656c2e6d6573736167696e672e696e626f756e6469646972656374696f6e01696f7065726174696f6e18336a70726f746f636f6c4964016c73657373696f6e45706f6368036d706565725075626c69634b6579582102c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+  "grantScopeKeysInOrder": [
+    "scope",
+    "direction",
+    "operation",
+    "protocolId",
+    "sessionEpoch",
+    "peerPublicKey"
+  ],
+  "grantScopeScopeVariantHex": "a66573636f7065781a6368616e6e656c2e6d6573736167696e672e6f7574626f756e6469646972656374696f6e02696f7065726174696f6e18336a70726f746f636f6c4964016c73657373696f6e45706f6368036d706565725075626c69634b6579582102c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+  "grantScopePeerVariantHex": "a66573636f706578196368616e6e656c2e6d6573736167696e672e696e626f756e6469646972656374696f6e01696f7065726174696f6e18336a70726f746f636f6c4964016c73657373696f6e45706f6368036d706565725075626c69634b657958210379be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+  "grantScopeProtocolVariantHex": "a66573636f706578196368616e6e656c2e6d6573736167696e672e696e626f756e6469646972656374696f6e01696f7065726174696f6e18336a70726f746f636f6c4964046c73657373696f6e45706f6368036d706565725075626c69634b6579582102c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+  "negativeCases": [
+    {
+      "id": "scope-neg-peer-change",
+      "description": "换对端必须改变 grantScope",
+      "expectError": "scope-differs"
+    },
+    {
+      "id": "scope-neg-direction-change",
+      "description": "换方向必须改变 grantScope",
+      "expectError": "scope-differs"
+    },
+    {
+      "id": "scope-neg-protocol-change",
+      "description": "换协议必须改变 grantScope",
+      "expectError": "scope-differs"
+    },
+    {
+      "id": "scope-neg-unregistered-protocol",
+      "description": "未登记协议直接拒绝，不降级",
+      "expectError": "invalid-request"
+    },
+    {
+      "id": "scope-neg-no-parser",
+      "description": "无语义解析器的消息不产生 grantScope",
+      "expectError": "need-user"
+    }
+  ]
+}

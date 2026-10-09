@@ -1,0 +1,105 @@
+{
+  "manifestVersion": "0.1",
+  "vectorSet": "vlp-core-0.1",
+  "spec": {
+    "core": "0.1",
+    "security": "0.1",
+    "profiles": {
+      "identity": "0.1",
+      "bsv.p2pkh": "0.1",
+      "channel": "0.1",
+      "local-secret": "0.1",
+      "content": "0.1",
+      "evidence": null,
+      "migration": "0.1"
+    }
+  },
+  "generator": {
+    "path": "tools/refgen/generate_vectors.py",
+    "referencePath": "A",
+    "algorithm": "vlp-ref-python-a",
+    "language": "python3-stdlib-only",
+    "sourceCommits": {
+      "Rockey": "0156bb1b36ccb004ad7443b20fd0e249a355ab21",
+      "Keymaster": "5c7d4540ef63248bb4f822679312953a1ebc96ab"
+    },
+    "notes": [
+      "期望字节由独立参照实现计算，不是 grep 源码常量，也不是 SDK 自身输出。",
+      "AES-256-GCM 与 ECDSA 由 conformance 的 Node 路径与公开标准向量覆盖，两路径不共享代码。",
+      "所有材料为公开测试材料，无真实 PIN/私钥/数据库。",
+      "公开 fixture 不代表已访问真实链上或信誉服务。"
+    ]
+  },
+  "files": [
+    {
+      "path": "cbor/cbor.json",
+      "suite": "cbor",
+      "version": "0.1",
+      "sha256": "5015d8fcab3557b44c5bac6c00e579a8982be2872daad7e4aa43dfad739126dd",
+      "bytes": 3668
+    },
+    {
+      "path": "cbor/negative.json",
+      "suite": "cbor-negative",
+      "version": "0.1",
+      "sha256": "4f6d6545605d787a9cefdf2e11058fc9dd1e0e73839c7db9d70b8dd441e28549",
+      "bytes": 4474
+    },
+    {
+      "path": "frame/frame.json",
+      "suite": "frame",
+      "version": "0.1",
+      "sha256": "42388548efb8a0d7547f665e38ee17d0ccc31f629aa4e3b4bac6435518be916f",
+      "bytes": 4487
+    },
+    {
+      "path": "handshake/handshake.json",
+      "suite": "handshake",
+      "version": "0.1",
+      "sha256": "dadce639459b3a04f894aae9ce120a8f57334ddb8f265783a2c49d7c26655b0f",
+      "bytes": 2254
+    },
+    {
+      "path": "commitment/commitment.json",
+      "suite": "commitment",
+      "version": "0.1",
+      "sha256": "9ea1f23ee4ab923b047c890ef048e926773e8030b7cc6c336a5bad0c39abc289",
+      "bytes": 1817
+    },
+    {
+      "path": "crypto/crypto.json",
+      "suite": "crypto",
+      "version": "0.1",
+      "sha256": "6d9e84635e15028409f8a71ede0fe416508215e05a76f2c9335b1a91b224f845",
+      "bytes": 3088
+    },
+    {
+      "path": "profiles/bsv-p2pkh.json",
+      "suite": "bsv-p2pkh",
+      "version": "0.1",
+      "sha256": "03ab10e2f9747c053b35fedd078b18fb49cf12f89ce16c3e976830d0a31dc38c",
+      "bytes": 3423
+    },
+    {
+      "path": "limits/frame-capacity.json",
+      "suite": "limits",
+      "version": "0.1",
+      "sha256": "5fe0b55f27af59c292f90cb9666842ea9e1927ce3567feb7804114fd6c9f8912",
+      "bytes": 1438
+    },
+    {
+      "path": "policy/scope.json",
+      "suite": "scope",
+      "version": "0.1",
+      "sha256": "d38f37d13712d317395d2978b1ee618d376bc6dc365fc051108572d516b876a2",
+      "bytes": 2485
+    },
+    {
+      "path": "profiles/envelope.json",
+      "suite": "envelope",
+      "version": "0.1",
+      "sha256": "0cdb03a9e48504d1ff81ba872c41f5f6834d545e66ed7bfbb309ec3b038f1f92",
+      "bytes": 9294
+    }
+  ]
+}

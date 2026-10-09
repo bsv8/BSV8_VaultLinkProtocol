@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vaultlink.invalid/schemas/vlp/0.1/envelope.schema.json",
+  "title": "VLP 0.1 消息信封",
+  "description": "结构性检查。业务安全验证（承诺覆盖、前序归属、范围提取、脚本匹配、授权）不由此 schema 负责——通过本 schema 不代表请求会被接受。依据 spec/core/02-编码.md §3.2 与 spec/profiles/00-通用约定.md §1。",
+  "type": "object",
+  "oneOf": [
+    { "$ref": "#/$defs/identityProve" },
+    { "$ref": "#/$defs/identityAuthorize" },
+    { "$ref": "#/$defs/txP2pkhSign" },
+    { "$ref": "#/$defs/localSecretSeal" },
+    { "$ref": "#/$defs/localSecretOpen" },
+    { "$ref": "#/$defs/contentAttest" },
+    { "$ref": "#/$defs/migrationImport" }
+  ],
+  "$defs": {
+    "hex32": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "小写 hex，解码后 32 字节。大写一律拒绝。"
+    },
+    "hex16": { "type": "string", "pattern": "^[0-9a-f]{32}$" },
+    "hex12": { "type": "string", "pattern": "^[0-9a-f]{24}$" },
+    "pubkey": {
+      "type": "string",
+      "pattern": "^0[23][0-9a-f]{64}$",
+      "description": "33 字节压缩 secp256k1 公钥，小写 hex。"
+    },
+    "opVersion": { "const": 1 },
+    "txid": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "32 字节，字节序与 rawTx 中一致。"
+    },
+    "scriptP2pkh": {
+      "type": "string",
+      "pattern": "^76a914[0-9a-f]{40}88ac$",
+      "description": "恰好 25 字节标准 P2PKH。其它脚本模板不接受。"
+    },
+    "satoshis": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 18446744073709551615,
+      "description": "u64 satoshi。JS 表示必须用 BigInt。"
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 95,
+      "pattern": "^[\\u0020-\\u007E\\u0080-\\uFFFF]+$",
+      "description": "每字节 > 0x1F 且 != 0x7F；良构 UTF-8。上限 95 与规范一致。"
+    },
+    "purpose": { "type": "string", "minLength": 1, "maxLength": 63 },
+    "prevout": {
+      "type": "object",
+      "required": ["txid", "vout", "proven", "script", "satoshis"],
+      "additionalProperties": false,
+      "properties": {
+        "txid": { "$ref": "#/$defs/txid" },
+        "vout": { "type": "integer", "minimum": 0 },
+        "proven": {
+          "type": "boolean",
+          "description": "仅为主机声称。不影响签名结果，不进承诺。"
+        },
+        "script": { "$ref": "#/$defs/scriptP2pkh" },
+        "satoshis": { "$ref": "#/$defs/satoshis" }
+      }
+    },
+    "sealedV3": {
+      "type": "object",
+      "required": ["saltHex", "version", "nonceHex", "keySource", "ciphertextHex"],
+      "additionalProperties": false,
+      "properties": {
+        "saltHex": { "$ref": "#/$defs/hex16" },
+        "version": { "const": 3 },
+        "nonceHex": { "$ref": "#/$defs/hex12" },
+        "keySource": { "const": "active-key-hkdf-v1" },
+        "ciphertextHex": { "type": "string", "pattern": "^[0-9a-f]+$" }
+      }
+    },
+
+    "identityProve": {
+      "type": "object",
+      "required": ["op", "opVersion", "challenge", "purpose"],
+      "additionalProperties": false,
+      "properties": {
+        "op": { "const": "identity.prove" },
+        "opVersion": { "$ref": "#/$defs/opVersion" },
+        "challenge": { "$ref": "#/$defs/hex32" },
+        "purpose": { "$ref": "#/$defs/purpose" }
+      }
+    },
+    "identityAuthorize": {
+      "type": "object",
+      "required": ["op", "opVersion", "challenge", "purpose"],
+      "additionalProperties": false,
+      "properties": {
+        "op": { "const": "identity.authorize" },
+        "opVersion": { "$ref": "#/$defs/opVersion" },
+        "challenge": { "$ref": "#/$defs/hex32" },
+        "purpose": { "$ref": "#/$defs/purpose" }
+      }
+    },
+    "txP2pkhSign": {
+      "type": "object",
+      "required": ["op", "opVersion", "rawTx", "network", "prevouts", "inputIndex"],
+      "additionalProperties": false,
+      "properties": {
+        "op": { "const": "tx.p2pkh-sign" },
+        "opVersion": { "$ref": "#/$defs/opVersion" },
+        "rawTx": {
+          "type": "string",
+          "pattern": "^[0-9a-f]+$",
+          "description": "完整未签名交易，1..640 字节。上限由单帧承载能力反推。"
+        },
+        "network": { "const": 0, "description": "仅 BSV mainnet。" },
+        "prevouts": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": { "$ref": "#/$defs/prevout" }
+        },
+        "inputIndex": { "type": "integer", "minimum": 0, "maximum": 3 }
+      }
+    },
+    "localSecretSeal": {
+      "type": "object",
+      "required": ["op", "opVersion", "scope", "plaintext"],
+      "additionalProperties": false,
+      "properties": {
+        "op": { "const": "local-secret.seal" },
+        "opVersion": { "$ref": "#/$defs/opVersion" },
+        "scope": { "$ref": "#/$defs/scope" },
+        "plaintext": {
+          "type": "string",
+          "pattern": "^[0-9a-f]+$",
+          "description": "1..512 字节明文。上限由单帧承载能力反推。"
+        }
+      }
+    },
+    "localSecretOpen": {
+      "type": "object",
+      "required": ["op", "opVersion", "scope", "sealed"],
+      "additionalProperties": false,
+      "properties": {
+        "op": { "const": "local-secret.open" },
+        "opVersion": { "$ref": "#/$defs/opVersion" },
+        "scope": { "$ref": "#/$defs/scope" },
+        "sealed": { "$ref": "#/$defs/sealedV3" }
+      }
+    },
+    "contentAttest": {
+      "type": "object",
+      "required": ["op", "opVersion", "digestHex", "fileName", "purpose"],
+      "additionalProperties": false,
+      "properties": {
+        "op": { "const": "content.attest-digest" },
+        "opVersion": { "$ref": "#/$defs/opVersion" },
+        "digestHex": { "$ref": "#/$defs/hex32" },
+        "fileName": { "type": "string", "minLength": 1, "maxLength": 47 },
+        "purpose": { "$ref": "#/$defs/purpose" }
+      }
+    },
+    "migrationImport": {
+      "type": "object",
+      "required": ["op", "opVersion", "privKey", "commitment"],
+      "additionalProperties": false,
+      "properties": {
+        "op": { "const": "migration.import" },
+        "opVersion": { "$ref": "#/$defs/opVersion" },
+        "privKey": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "commitment": { "$ref": "#/$defs/hex32" }
+      }
+    }
+  }
+}

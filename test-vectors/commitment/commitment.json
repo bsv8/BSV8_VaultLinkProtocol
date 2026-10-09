@@ -1,0 +1,40 @@
+{
+  "suite": "commitment",
+  "version": "0.1",
+  "inputs": {
+    "identityPurpose": "vaultlink-test",
+    "identityChallenge": "dde5ca1f2ee6f710429f556be3bde8b7ce2d0844899d7b3e7ca46e90c03ec26d"
+  },
+  "expected": {
+    "genericCommitment": "4eca4522129c3accb96fe43b8e017403d638d06459492c307ccc144f51251962",
+    "identityCommitObjectHex": "a267707572706f73656e7661756c746c696e6b2d74657374696368616c6c656e67655820dde5ca1f2ee6f710429f556be3bde8b7ce2d0844899d7b3e7ca46e90c03ec26d",
+    "identityCommitment": "06690b05bc6387fae109212208e8b515da55c6c4baa9e2b438ba8db377df5717",
+    "identityProveStatement": "0e7b31a66b8685816aa3bb190f1859bb9b0ae25db3dc99f124c07ea542db03f1",
+    "identityAuthorizeStatement": "b1b15805822e8111ea0efb40cc535469561b27ab8e6c949115204911007c7d11",
+    "contentStatement": "f9c70ff01c90ca68bb5277d538f0b58f25e6855734b0ad4fb20cbca920df0635",
+    "importCommitment": "d04c09e5c7b19ecd844cf38faeba9b3e9a77a2b1e50488009509b8209de811c8",
+    "commitObjectHex": "a267707572706f73656e7661756c746c696e6b2d74657374696368616c6c656e676558207812abf46c6b836c742ef93953f86910e9c387e18dadabffda6cedc2701a03f8"
+  },
+  "negativeCases": [
+    {
+      "id": "commit-neg-tamper-purpose",
+      "description": "改 purpose 必须改变承诺",
+      "expectError": "commitment-differs"
+    },
+    {
+      "id": "commit-neg-tamper-challenge",
+      "description": "改 challenge 必须改变承诺",
+      "expectError": "commitment-differs"
+    },
+    {
+      "id": "commit-neg-profile-mismatch",
+      "description": "换 profileId 必须改变承诺（不得跨 Profile 重放）",
+      "expectError": "commitment-differs"
+    },
+    {
+      "id": "commit-neg-statement-domain-isolation",
+      "description": "prove 与 authorize 的声明摘要必须不同",
+      "expectError": "digest-differs"
+    }
+  ]
+}

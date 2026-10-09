@@ -1,0 +1,47 @@
+{
+  "suite": "limits",
+  "version": "0.1",
+  "limits": {
+    "maxFramePayload": 1024,
+    "maxMessage": 896,
+    "aeadOverhead": 16,
+    "frameOverhead": 15,
+    "maxPendingRequests": 4,
+    "maxResultCache": 8,
+    "maxSessions": 2,
+    "maxSessionDecisions": 8
+  },
+  "samples": [
+    {
+      "id": "cap-p2pkh-1in-2out",
+      "description": "BSV P2PKH 1 输入 2 输出完整请求体（典型场景）",
+      "encodedBytes": 289,
+      "fitsSingleFrame": true
+    },
+    {
+      "id": "cap-p2pkh-4in-6out",
+      "description": "BSV P2PKH 上限样本（4 输入 6 输出）",
+      "encodedBytes": 855,
+      "fitsSingleFrame": true
+    },
+    {
+      "id": "cap-local-secret-512",
+      "description": "local-secret 明文 512 字节（VLP 收敛后的上限）",
+      "encodedBytes": 661,
+      "fitsSingleFrame": true
+    },
+    {
+      "id": "cap-local-secret-4096-old",
+      "description": "local-secret 明文 4096 字节（现有实现声明的上限）",
+      "encodedBytes": 4245,
+      "fitsSingleFrame": false
+    },
+    {
+      "id": "cap-channel-512-old",
+      "description": "channel 消息 512 字节（现有实现声明的上限）",
+      "encodedBytes": 629,
+      "fitsSingleFrame": true
+    }
+  ],
+  "conclusion": "VLP 0.1 的单帧上限不能承载现有实现声明的 rawTx ≤ 8192 / channel message ≤ 512 / local-secret plaintext ≤ 4096。字段上限已按单帧收敛，超限明确拒绝。"
+}

@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>VaultLink SDK 集成测试</title>
+<style>body{font-family:system-ui,sans-serif;max-width:1120px;margin:40px auto;padding:0 20px;color:#182538;background:#f8fafc}button{padding:10px 18px;margin:8px 8px 16px 0;border:1px solid #ccd4df;border-radius:6px;background:white;cursor:pointer}button:disabled{opacity:.5;cursor:default}#run{background:#175acf;color:white}#status{padding:16px;background:#eaf0f8;border-radius:6px}table{width:100%;border-collapse:collapse;background:white}th,td{text-align:left;padding:12px;border-bottom:1px solid #e1e7ef}tr[data-status="passed"] td:nth-child(3){color:#167044}tr[data-status="failed"]{color:#aa2020}small{color:#516175}</style></head>
+<body><h1>VaultLink SDK 集成测试</h1><p>Web SDK ↔ USB ↔ ESP32 SDK。仅连接装有 E2E Demo 固件的测试设备；使用公开测试密钥，不广播交易。</p>
+<button id="authorize">授权设备</button><button id="run">运行全部测试</button><button id="report" disabled>下载报告</button>
+<p id="status" role="status">加载中…</p><p><small>当前配对码：</small><code id="pairing">—</code></p>
+<table><thead><tr><th>编号</th><th>检查内容</th><th>结果</th><th>耗时</th><th>错误</th></tr></thead><tbody id="results"></tbody></table>
+<script type="module" src="/main.js"></script></body></html>
