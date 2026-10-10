@@ -103,6 +103,7 @@ class IdentityKey {
   Rng rng;
   bool unlocked = false;
   Bytes public_bytes;
+  Bytes inbox_key(const Bytes &peer,const Bytes &salt,const std::string &channel,const std::string &sender);
   static Bytes der_int(mbedtls_mpi &v) {
     Bytes b(32);
     check(mbedtls_mpi_write_binary(&v, b.data(), 32));
@@ -142,6 +143,10 @@ public:
     require(public_bytes.size() == 33, "invalid-key");
     return public_bytes;
   }
+  Value seal_local(const std::string &scope,const Bytes &plain);
+  Bytes open_local(const std::string &scope,const Value &sealed);
+  Bytes seal_channel(const Bytes &signed_json);
+  Bytes open_channel(const Bytes &envelope_json);
   // 仅设备执行器内部调用；不注册 USB signHash 操作。
   Bytes sign(const Bytes &digest) {
     require(unlocked, "locked");

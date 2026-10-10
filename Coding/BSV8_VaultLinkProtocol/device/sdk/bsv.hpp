@@ -84,6 +84,26 @@ inline bool is_p2pkh(const Bytes &s) {
   return s.size() == 25 && s[0] == 0x76 && s[1] == 0xa9 && s[2] == 0x14 &&
          s[23] == 0x88 && s[24] == 0xac;
 }
+// 地址由实际输出脚本生成，不能采用主机提供的收款方标签。
+inline std::string p2pkh_output_address(const Bytes &script, bool testnet = false) {
+  require(is_p2pkh(script), "unsupported-script");
+  Bytes payload{static_cast<uint8_t>(testnet ? 111 : 0)};
+  payload.insert(payload.end(), script.begin() + 3, script.begin() + 23);
+  auto checksum = sha256d(payload);
+  payload.insert(payload.end(), checksum.begin(), checksum.begin() + 4);
+  std::vector<unsigned> digits;
+  size_t zeros = 0;
+  while (zeros < payload.size() && payload[zeros] == 0) ++zeros;
+  for (size_t i = zeros; i < payload.size(); ++i) {
+    unsigned carry = payload[i];
+    for (auto &digit : digits) { carry += digit * 256; digit = carry % 58; carry /= 58; }
+    while (carry) { digits.push_back(carry % 58); carry /= 58; }
+  }
+  constexpr char alphabet[] = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+  std::string address(zeros, '1');
+  for (auto i = digits.rbegin(); i != digits.rend(); ++i) address += alphabet[*i];
+  return address;
+}
 inline Bytes own_script(const Bytes &pub) {
   return join({Bytes{0x76, 0xa9, 0x14}, hash160(pub), Bytes{0x88, 0xac}});
 }
@@ -91,8 +111,8 @@ struct Review {
   uint64_t amount = 0, change = 0, fee = 0;
   std::vector<Bytes> digests;
 };
-inline Bytes sighash(const Transaction &t, size_t index, const Output &prev) {
-  require(index < t.inputs.size() && is_p2pkh(prev.script), "invalid-prevout");
+inline Bytes forkid_sighash(const Transaction &t, size_t index, const Output &prev) {
+  require(index < t.inputs.size() && !prev.script.empty() && prev.script.size() <= 1024, "invalid-prevout");
   Bytes refs, seqs, outs;
   for (const auto &i : t.inputs) {
     auto b = join({i.txid, le32(i.vout)});
@@ -109,6 +129,10 @@ inline Bytes sighash(const Transaction &t, size_t index, const Output &prev) {
       join({le32(t.version), sha256d(refs), sha256d(seqs), i.txid, le32(i.vout),
             compact(prev.script.size()), prev.script, le64(prev.amount),
             le32(i.sequence), sha256d(outs), le32(t.locktime), le32(0x41)}));
+}
+inline Bytes sighash(const Transaction &t, size_t index, const Output &prev) {
+  require(is_p2pkh(prev.script), "invalid-prevout");
+  return forkid_sighash(t, index, prev);
 }
 inline Review inspect(const Bytes &raw, const std::vector<Bytes> &evidence,
                       const Bytes &public_key) {
@@ -155,7 +179,8 @@ inline Bytes commitment(const std::string &profile, const Value &core) {
   label.push_back(0);
   label += profile;
   label.push_back(0);
-  return sha256d(
-      join({Bytes(label.begin(), label.end()), Bytes{1}, encode(core)}));
+  auto encoded=encode(core,32768);WipeBytes wipe_encoded{encoded};
+  Bytes bytes(label.begin(),label.end());WipeBytes wipe_input{bytes};bytes.push_back(1);
+  bytes.insert(bytes.end(),encoded.begin(),encoded.end());return sha256d(bytes);
 }
 } // namespace vaultlink

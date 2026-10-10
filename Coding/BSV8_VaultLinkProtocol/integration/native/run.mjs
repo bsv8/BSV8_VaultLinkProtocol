@@ -120,7 +120,7 @@ try {
       const state = await restored.snapshot();
       if (
         state.sessions[0].used !== 300n ||
-        state.sessions[0].active !== false ||
+        state.sessions[0].active !== true ||
         state.pending[0].state !== "signed"
       )
         throw Error("C++ → TypeScript persistent state crosscheck failed");

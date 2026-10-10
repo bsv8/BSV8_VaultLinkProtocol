@@ -4,6 +4,7 @@ import { FrameReader, frame, Type, type Frame } from "./frame.js";
 import {
   DeviceHandshake,
   HostHandshake,
+  parseAck,
   type Generations,
   type IdentityVerifier,
   type PairedKeys,
@@ -70,13 +71,26 @@ export interface ReadySession {
   binding: Binding;
 }
 export async function connectHost(
-  transport: Transport,
-  generations: Generations,
-  expectedPublicKey: Uint8Array,
-  verifier: IdentityVerifier,
-  confirmPairing: (code: string) => Promise<boolean>,
+  transport: Transport, generations: Generations, expectedPublicKey: Uint8Array,
+  verifier: IdentityVerifier, confirmPairing: (code: string) => Promise<boolean>,
   capabilities: number[] = [0x221],
 ): Promise<ProtocolClient> {
+  return (await connectVerifiedHost(transport,generations,expectedPublicKey,verifier,confirmPairing,capabilities)).client;
+}
+/** 首次绑定专用：两端明确配对并证明持有权后才交付公钥。
+ * 此入口不用于已有钱包重连，不能把 wrong-key 转成首次绑定。
+ */
+export function enrollHost(
+  transport: Transport, generations: Generations,
+  verifier: IdentityVerifier, confirmPairing: (code: string) => Promise<boolean>,
+  capabilities: number[] = [0x221],
+): Promise<{client:ProtocolClient;publicKey:Uint8Array}> {
+  return connectVerifiedHost(transport,generations,null,verifier,confirmPairing,capabilities);
+}
+async function connectVerifiedHost(
+  transport: Transport, generations: Generations, expectedPublicKey: Uint8Array | null,
+  verifier: IdentityVerifier, confirmPairing: (code: string) => Promise<boolean>, capabilities: number[],
+): Promise<{client:ProtocolClient;publicKey:Uint8Array}> {
   const link = new PacketLink(transport),
     h = new HostHandshake();
   let keys: PairedKeys | undefined;
@@ -92,7 +106,9 @@ export async function connectHost(
     if (ackFrame.type !== Type.HELLO_ACK || ackFrame.seq !== 0)
       fail("bad-hello");
     const ack = decode(ackFrame.payload);
-    keys = await h.acceptAck(ack, expectedPublicKey);
+    // 未绑定只接受本次 ACK 的候选 Key；候选尚未认证，不向调用者发布。
+    const identity = expectedPublicKey?.slice() ?? parseAck(ack).publicKey.slice();
+    keys = await h.acceptAck(ack, identity);
     if (!(await confirmPairing(keys.pairingCode))) fail("pairing-denied");
     await link.send(
       await keys.send.seal(
@@ -100,7 +116,7 @@ export async function connectHost(
         encode({ code: keys.pairingCode }),
       ),
     );
-    let f = await link.read();
+    let f = await link.read(60000); // 用户在设备核对配对码的时间，不是业务免确认授权。
     if (f.type !== Type.PAIR_OK) fail("bad-pair");
     const paired = object(decode(await keys.receive.open(f)), ["paired"]);
     if (paired.paired !== true) fail("pairing-denied");
@@ -119,7 +135,7 @@ export async function connectHost(
     ]);
     if (
       !(proof.publicKey instanceof Uint8Array) ||
-      !equal(proof.publicKey, expectedPublicKey) ||
+      !equal(proof.publicKey, identity) ||
       !(proof.challenge instanceof Uint8Array) ||
       !equal(proof.challenge, challenge) ||
       typeof proof.sessionId !== "number" ||
@@ -130,7 +146,7 @@ export async function connectHost(
     await verifyPossession(
       verifier,
       keys.transcript,
-      expectedPublicKey,
+      identity,
       proof.sessionId,
       challenge,
       proof.signature,
@@ -142,12 +158,7 @@ export async function connectHost(
       connectionId: a.connectionId as number,
       deviceRunId: a.deviceRunId as number,
     };
-    return new ProtocolClient(
-      link.clientTransport(),
-      keys.send,
-      keys.receive,
-      binding,
-    );
+    return {client:new ProtocolClient(link.clientTransport(),keys.send,keys.receive,binding),publicKey:identity.slice()};
   } catch (e) {
     keys?.send.close();
     keys?.receive.close();

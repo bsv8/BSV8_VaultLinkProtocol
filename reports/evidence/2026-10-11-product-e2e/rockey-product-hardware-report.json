@@ -1,0 +1,197 @@
+{
+  "status": "passed",
+  "hardware": true,
+  "finalDevice": {
+    "ui": {
+      "pin": false,
+      "read": true,
+      "fault": "",
+      "lines": 0,
+      "raise": false,
+      "pairing": false,
+      "reviews": 16,
+      "visible": false,
+      "canRaise": false,
+      "pairCode": "",
+      "position": 6,
+      "operation": ""
+    },
+    "screen": 8,
+    "waitMs": 0,
+    "buildId": "rockey-e2e-20261010T164714584Z",
+    "firmware": "rockey-product-e2e-v1",
+    "freeHeap": 160196,
+    "isolated": true,
+    "unlocked": true,
+    "failCount": 0,
+    "pinCursor": 9,
+    "publicKey": "03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a",
+    "rxDropped": 0,
+    "stackFree": 23412,
+    "pinEntered": 0,
+    "initialized": true,
+    "serialErrors": 0,
+    "selftestFailed": false
+  },
+  "scope": "Keymaster production Worker adapters → VLP SDK → real USB → RocKey product firmware/UI/LittleFS",
+  "runId": "877f5492-cd67-4666-9aeb-b8f65df80d37",
+  "results": [
+    {
+      "name": "wrong PIN, persistent failure and restart lock",
+      "status": "passed"
+    },
+    {
+      "name": "device button-path pairing denial rejects Keymaster enrollment",
+      "status": "passed"
+    },
+    {
+      "name": "Keymaster Worker enrollment verifies matching codes and key possession",
+      "status": "passed"
+    },
+    {
+      "name": "ESP32 restart preserves channels and closed session ledger",
+      "status": "passed"
+    },
+    {
+      "name": "test firmware identity, self-test and isolated wallet",
+      "status": "passed",
+      "ms": 209
+    },
+    {
+      "name": "configure two App channels and one plugin channel through device UI",
+      "status": "passed",
+      "ms": 22887
+    },
+    {
+      "name": "unregistered or absent spending channel is refused",
+      "status": "passed",
+      "ms": 313
+    },
+    {
+      "name": "App connection session limit confirmation",
+      "status": "passed",
+      "ms": 4437
+    },
+    {
+      "name": "within single/session limits: no review",
+      "status": "passed",
+      "ms": 1483
+    },
+    {
+      "name": "equal cumulative limit across two channels: no review",
+      "status": "passed",
+      "ms": 1790
+    },
+    {
+      "name": "over session total: deny produces no charge/signature",
+      "status": "passed",
+      "ms": 3921
+    },
+    {
+      "name": "over session total: one-time approval keeps configured limit",
+      "status": "passed",
+      "ms": 17922
+    },
+    {
+      "name": "increase current session limit while confirming",
+      "status": "passed",
+      "ms": 20947
+    },
+    {
+      "name": "plugin single-limit equality remains automatic without total limit",
+      "status": "passed",
+      "ms": 2186
+    },
+    {
+      "name": "completed paymentId cannot sign or charge twice",
+      "status": "passed",
+      "ms": 1397
+    },
+    {
+      "name": "plugin over single limit: deny then allow",
+      "status": "passed",
+      "ms": 14871
+    },
+    {
+      "name": "review requires scrolling; short B cannot authorize",
+      "status": "passed",
+      "ms": 15999
+    },
+    {
+      "name": "cancel pending App payment clears review and retains ledger",
+      "status": "passed",
+      "ms": 1529
+    },
+    {
+      "name": "standard BSV payment uses product signing profile",
+      "status": "passed",
+      "ms": 8618
+    },
+    {
+      "name": "connect fee pool funding and cumulative incremental payment",
+      "status": "passed",
+      "ms": 15135
+    },
+    {
+      "name": "bitfs fee pool funding and cumulative incremental payment",
+      "status": "passed",
+      "ms": 10900
+    },
+    {
+      "name": "close App connection retains total and forbids further payment",
+      "status": "passed",
+      "ms": 960
+    }
+  ],
+  "device": {
+    "ui": {
+      "pin": false,
+      "read": true,
+      "fault": "",
+      "lines": 2,
+      "raise": false,
+      "pairing": true,
+      "reviews": 1,
+      "visible": false,
+      "canRaise": false,
+      "pairCode": "151362",
+      "position": 0,
+      "operation": ""
+    },
+    "screen": 8,
+    "waitMs": 0,
+    "buildId": "rockey-e2e-20261010T164714584Z",
+    "firmware": "rockey-product-e2e-v1",
+    "freeHeap": 169300,
+    "isolated": true,
+    "unlocked": true,
+    "failCount": 0,
+    "pinCursor": 7,
+    "publicKey": "03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a",
+    "rxDropped": 0,
+    "stackFree": 25652,
+    "pinEntered": 0,
+    "initialized": true,
+    "serialErrors": 0,
+    "selftestFailed": false
+  },
+  "document": {
+    "format": "keymaster.hardware-key",
+    "version": 1,
+    "backend": "vaultlink",
+    "wireVersion": 2,
+    "label": "RocKey E2E",
+    "publicKeyHex": "03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a",
+    "walletGeneration": "e37cfbfb-81fb-4b7a-9c59-35d4f65fdd68",
+    "backendGeneration": 1
+  },
+  "timestamp": "2026-10-10T17:01:24.130Z",
+  "manualPending": [
+    "release firmware physical buttons and screen",
+    "physical power cut during commit",
+    "bidirectional migration hardware acceptance"
+  ],
+  "browserVersion": "155.0.4283.45",
+  "serialPort": "/dev/cu.usbserial-02010546",
+  "expectedFirmwareSHA256": "b2a1a5617e2cdeb7213b4b79e2c6fe0d3fc2a4ea203e15df6dadeda75f020970"
+}

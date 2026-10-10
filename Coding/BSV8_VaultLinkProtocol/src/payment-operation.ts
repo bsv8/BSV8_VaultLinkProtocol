@@ -11,7 +11,7 @@ import {
 import { type OperationHandler } from "./device.js";
 /** 同一个实际交易只预占一次；所有输入共用一次授权。宿主负责原子绑定 policy 的 Key 与本 DeviceKey。 */
 export class P2pkhPaymentOperation implements OperationHandler {
-  readonly profile = "bsv-payment";
+  readonly profile: string;
   readonly version = 1;
   constructor(
     private key: DeviceIdentityKey,
@@ -20,19 +20,20 @@ export class P2pkhPaymentOperation implements OperationHandler {
       owner: string;
       kind: "app" | "plugin";
       sessionId: string | null;
-    },
+    } | null,
     private confirm: (
       request: PaymentInspection,
       quote: Quote,
       signal: AbortSignal,
     ) => Promise<{ allow: boolean; raiseSessionLimit?: bigint }>,
-  ) {}
+  ) { this.profile = context === null ? "bsv-payment-context" : "bsv-payment"; }
   async verify(body: Value): Promise<Value> {
     const b = object(body, [
       "rawTx",
       "prevTransactions",
       "channelId",
       "paymentId",
+      ...(this.context === null ? ["sessionId"] : []),
     ]);
     if (
       !(b.rawTx instanceof Uint8Array) ||
@@ -51,12 +52,12 @@ export class P2pkhPaymentOperation implements OperationHandler {
       this.key.publicKey(),
       0,
     );
-    if (!review.amount) fail("invalid-amount");
     /* Profile 不接收主机自报 amount/change，实际输出重新核算。 */ return {
       rawTx: frozen.rawTx!,
       prevTransactions: frozen.prevTransactions!,
       channelId: frozen.channelId!,
       paymentId: frozen.paymentId!,
+      ...(this.context === null ? { sessionId: frozen.sessionId! } : {}),
       amount: review.amount,
     };
   }
@@ -67,12 +68,22 @@ export class P2pkhPaymentOperation implements OperationHandler {
       "channelId",
       "paymentId",
       "amount",
+      ...(this.context === null ? ["sessionId"] : []),
     ]);
     if (typeof b.amount !== "bigint") fail("invalid-amount");
+    let context = this.context;
+    if (context === null) {
+      const snapshot = await this.policy.snapshot();
+      const channel = snapshot.channels.find(c => c.id === b.channelId);
+      if (!channel) fail("invalid-channel");
+      const sessionId = (core as Record<string, Value>).sessionId;
+      if (sessionId !== null && typeof sessionId !== "string") fail("invalid-session");
+      context = { owner: channel.owner, kind: channel.kind, sessionId };
+    }
     return {
       requestId: b.paymentId as string,
       channelId: b.channelId as string,
-      ...this.context,
+      ...context,
       network: "main",
       paymentType: "p2pkh",
       amount: b.amount,
@@ -111,9 +122,11 @@ export class P2pkhPaymentOperation implements OperationHandler {
     const p = await this.request(core),
       b = core as Record<string, Value>;
     let signatures: Uint8Array[];
+    let signingStarted = false;
     try {
       await this.policy.assertExecutable(p.requestId);
       if (signal.aborted) fail("revoked");
+      signingStarted = true;
       signatures = await this.key.signAllP2pkh(
         b.rawTx as Uint8Array,
         (b.prevTransactions as Uint8Array[]).map((transaction) => ({
@@ -123,7 +136,8 @@ export class P2pkhPaymentOperation implements OperationHandler {
         () => this.policy.assertExecutable(p.requestId),
       );
     } catch (e) {
-      await this.policy.releaseUnexecuted(p.requestId);
+      if (signingStarted) await this.policy.markUnknown(p.requestId);
+      else await this.policy.releaseUnexecuted(p.requestId);
       throw e;
     }
     /* 从此开始可能已有可花钱签名。落盘失败不释放额度，不交付签名。 */ await this.policy.markSigned(

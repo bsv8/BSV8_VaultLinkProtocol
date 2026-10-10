@@ -124,12 +124,8 @@ public:
     test_key[31] = 1;
     key.unlock(test_key);
     std::fill(test_key.begin(), test_key.end(), 0);
-    if (policy) {
-      try {
-        policy->close_sessions();
-      } catch (...) { /* 存储失败仍不恢复执行，下一次操作/重启显式失败。 */
-      }
-    }
+    // USB 断链清除当前适配器绑定；App 预算和累计保留。
+    // 只有 App 明确结束该连接才关闭预算，不能通过 USB 重连刷新额度。
   }
   Prepared prepare(const std::string &op, const Value &body,
                    const Bytes &hash) {

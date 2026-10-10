@@ -1,0 +1,590 @@
+
+> @vaultlink/sdk@0.2.0-draft.1 integration:rockey
+> node integration/rockey/run.mjs
+
+Selected physical port: /dev/cu.usbserial-02010546
+[WebServer] (node:46121) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:46123) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[RocKey E2E] device ready: {"ui":{"pin":false,"read":true,"fault":"","lines":0,"raise":false,"pairing":false,"reviews":0,"visible":false,"canRaise":false,"pairCode":"","position":0,"operation":""},"screen":1,"waitMs":0,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":217272,"isolated":true,"unlocked":false,"failCount":0,"pinCursor":0,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":25668,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] entering normal PIN
+[RocKey E2E] initial unlock complete
+[RocKey E2E] device before USB close: {"ui":{"pin":false,"read":true,"fault":"","lines":0,"raise":false,"pairing":false,"reviews":0,"visible":false,"canRaise":false,"pairCode":"","position":0,"operation":""},"screen":8,"waitMs":0,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":184488,"isolated":true,"unlocked":true,"failCount":0,"pinCursor":1,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":25556,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] entering wrong PIN
+[RocKey E2E] device before USB close: {"ui":{"pin":false,"read":true,"fault":"","lines":0,"raise":false,"pairing":false,"reviews":0,"visible":false,"canRaise":false,"pairCode":"","position":0,"operation":""},"screen":1,"waitMs":1239,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":217072,"isolated":true,"unlocked":false,"failCount":1,"pinCursor":3,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":25620,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] device ready: {"ui":{"pin":false,"read":true,"fault":"","lines":0,"raise":false,"pairing":false,"reviews":0,"visible":false,"canRaise":false,"pairCode":"","position":0,"operation":""},"screen":1,"waitMs":0,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":217272,"isolated":true,"unlocked":false,"failCount":1,"pinCursor":0,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":25652,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] entering normal PIN
+[RocKey E2E] passed: wrong PIN, persistent failure and restart lock
+[RocKey E2E] waiting for host pairing
+[RocKey E2E] VLP tx type=1 seq=0 size=185
+[RocKey E2E] VLP rx type=2 seq=0 size=204
+[RocKey E2E] waiting for device pairing
+[RocKey E2E] VLP tx type=3 seq=1 size=29
+[RocKey E2E] applying device pairing denial
+[RocKey E2E] VLP rx type=4 seq=1 size=25
+[RocKey E2E] Worker rejected: pairing-denied
+[RocKey E2E] enrollment failed: pairing-denied
+[RocKey E2E] device before USB close: {"ui":{"pin":false,"read":true,"fault":"","lines":0,"raise":false,"pairing":false,"reviews":1,"visible":false,"canRaise":false,"pairCode":"","position":0,"operation":""},"screen":1,"waitMs":0,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":216940,"isolated":true,"unlocked":false,"failCount":0,"pinCursor":7,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":25652,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] device ready: {"ui":{"pin":false,"read":true,"fault":"","lines":0,"raise":false,"pairing":false,"reviews":1,"visible":false,"canRaise":false,"pairCode":"","position":0,"operation":""},"screen":1,"waitMs":0,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":216940,"isolated":true,"unlocked":false,"failCount":0,"pinCursor":7,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":25652,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] entering normal PIN
+[RocKey E2E] passed: device button-path pairing denial rejects Keymaster enrollment
+[RocKey E2E] waiting for host pairing
+[RocKey E2E] VLP tx type=1 seq=0 size=185
+[RocKey E2E] VLP rx type=2 seq=0 size=204
+[RocKey E2E] waiting for device pairing
+[RocKey E2E] VLP tx type=3 seq=1 size=29
+[RocKey E2E] applying device pairing approval
+[RocKey E2E] VLP rx type=4 seq=1 size=25
+[RocKey E2E] VLP tx type=5 seq=2 size=61
+[RocKey E2E] VLP rx type=6 seq=2 size=218
+[RocKey E2E] passed: Keymaster Worker enrollment verifies matching codes and key possession
+[RocKey E2E] VLP tx type=16 seq=3 size=180
+[RocKey E2E] passed: test firmware identity, self-test and isolated wallet
+[RocKey E2E] VLP tx type=16 seq=4 size=189
+[RocKey E2E] VLP rx type=17 seq=3 size=164
+[RocKey E2E] VLP rx type=17 seq=4 size=731
+[RocKey E2E] VLP rx type=17 seq=5 size=515
+[RocKey E2E] review request: configure e2e.app.one
+[RocKey E2E] VLP tx type=16 seq=5 size=319
+[RocKey E2E] VLP tx type=16 seq=6 size=180
+[RocKey E2E] VLP rx type=17 seq=6 size=164
+[RocKey E2E] VLP tx type=16 seq=7 size=180
+[RocKey E2E] VLP rx type=17 seq=7 size=164
+[RocKey E2E] VLP tx type=16 seq=8 size=180
+[RocKey E2E] VLP rx type=17 seq=8 size=164
+[RocKey E2E] VLP tx type=16 seq=9 size=180
+[RocKey E2E] VLP rx type=17 seq=9 size=164
+[RocKey E2E] VLP tx type=16 seq=10 size=180
+[RocKey E2E] VLP rx type=17 seq=10 size=164
+[RocKey E2E] VLP tx type=16 seq=11 size=180
+[RocKey E2E] VLP rx type=17 seq=11 size=179
+[RocKey E2E] VLP rx type=17 seq=12 size=164
+[RocKey E2E] VLP tx type=16 seq=12 size=180
+[RocKey E2E] VLP rx type=17 seq=13 size=164
+[RocKey E2E] review after buttons: {"ui":{"pin":false,"read":true,"fault":"","lines":0,"raise":false,"pairing":false,"reviews":3,"visible":false,"canRaise":false,"pairCode":"","position":6,"operation":""},"screen":8,"waitMs":0,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":181632,"isolated":true,"unlocked":true,"failCount":0,"pinCursor":9,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":25396,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] VLP tx type=16 seq=13 size=189
+[RocKey E2E] VLP rx type=17 seq=14 size=731
+[RocKey E2E] VLP rx type=17 seq=15 size=515
+[RocKey E2E] review request: configure e2e.app.two
+[RocKey E2E] VLP tx type=16 seq=14 size=319
+[RocKey E2E] VLP tx type=16 seq=15 size=180
+[RocKey E2E] VLP rx type=17 seq=16 size=164
+[RocKey E2E] VLP tx type=16 seq=16 size=180
+[RocKey E2E] VLP rx type=17 seq=17 size=164
+[RocKey E2E] VLP tx type=16 seq=17 size=180
+[RocKey E2E] VLP rx type=17 seq=18 size=164
+[RocKey E2E] VLP tx type=16 seq=18 size=180
+[RocKey E2E] VLP rx type=17 seq=19 size=164
+[RocKey E2E] VLP tx type=16 seq=19 size=180
+[RocKey E2E] VLP rx type=17 seq=20 size=164
+[RocKey E2E] VLP tx type=16 seq=20 size=180
+[RocKey E2E] VLP rx type=17 seq=21 size=164
+[RocKey E2E] VLP rx type=17 seq=22 size=179
+[RocKey E2E] VLP tx type=16 seq=21 size=180
+[RocKey E2E] VLP rx type=17 seq=23 size=164
+[RocKey E2E] review after buttons: {"ui":{"pin":false,"read":true,"fault":"","lines":0,"raise":false,"pairing":false,"reviews":4,"visible":false,"canRaise":false,"pairCode":"","position":6,"operation":""},"screen":8,"waitMs":0,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":181632,"isolated":true,"unlocked":true,"failCount":0,"pinCursor":9,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":25396,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] VLP tx type=16 seq=22 size=189
+[RocKey E2E] VLP tx type=16 seq=23 size=180
+[RocKey E2E] VLP rx type=17 seq=24 size=731
+[RocKey E2E] VLP rx type=17 seq=25 size=515
+[RocKey E2E] review request: configure e2e.plugin
+[RocKey E2E] VLP tx type=16 seq=24 size=319
+[RocKey E2E] VLP rx type=17 seq=26 size=164
+[RocKey E2E] VLP tx type=16 seq=25 size=180
+[RocKey E2E] VLP rx type=17 seq=27 size=164
+[RocKey E2E] VLP tx type=16 seq=26 size=181
+[RocKey E2E] VLP rx type=17 seq=28 size=165
+[RocKey E2E] VLP tx type=16 seq=27 size=181
+[RocKey E2E] VLP rx type=17 seq=29 size=165
+[RocKey E2E] VLP tx type=16 seq=28 size=181
+[RocKey E2E] VLP rx type=17 seq=30 size=165
+[RocKey E2E] VLP tx type=16 seq=29 size=181
+[RocKey E2E] VLP rx type=17 seq=31 size=165
+[RocKey E2E] VLP tx type=16 seq=30 size=181
+[RocKey E2E] VLP rx type=17 seq=32 size=165
+[RocKey E2E] VLP rx type=17 seq=33 size=179
+[RocKey E2E] VLP tx type=16 seq=31 size=181
+[RocKey E2E] VLP rx type=17 seq=34 size=165
+[RocKey E2E] review after buttons: {"ui":{"pin":false,"read":true,"fault":"","lines":0,"raise":false,"pairing":false,"reviews":5,"visible":false,"canRaise":false,"pairCode":"","position":6,"operation":""},"screen":8,"waitMs":0,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":181632,"isolated":true,"unlocked":true,"failCount":0,"pinCursor":9,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":25252,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] passed: configure two App channels and one plugin channel through device UI
+[RocKey E2E] VLP tx type=16 seq=32 size=181
+[RocKey E2E] VLP tx type=16 seq=33 size=201
+[RocKey E2E] VLP rx type=17 seq=35 size=165
+[RocKey E2E] VLP rx type=17 seq=36 size=180
+[RocKey E2E] Worker rejected: invalid-channel
+[RocKey E2E] invalid channel rejected: invalid-channel
+[RocKey E2E] VLP tx type=16 seq=34 size=249
+[RocKey E2E] VLP rx type=17 seq=37 size=180
+[RocKey E2E] Worker rejected: invalid-channel
+[RocKey E2E] invalid channel rejected: invalid-channel
+[RocKey E2E] passed: unregistered or absent spending channel is refused
+[RocKey E2E] review request: session-open 877f5492-cd67-4666-9aeb-b8f65df80d37
+[RocKey E2E] VLP tx type=16 seq=35 size=259
+[RocKey E2E] VLP tx type=16 seq=36 size=181
+[RocKey E2E] VLP rx type=17 seq=38 size=165
+[RocKey E2E] VLP tx type=16 seq=37 size=181
+[RocKey E2E] VLP rx type=17 seq=39 size=165
+[RocKey E2E] VLP tx type=16 seq=38 size=181
+[RocKey E2E] VLP rx type=17 seq=40 size=165
+[RocKey E2E] VLP tx type=16 seq=39 size=181
+[RocKey E2E] VLP rx type=17 seq=41 size=182
+[RocKey E2E] VLP rx type=17 seq=42 size=165
+[RocKey E2E] review after buttons: {"ui":{"pin":false,"read":true,"fault":"","lines":0,"raise":false,"pairing":false,"reviews":6,"visible":false,"canRaise":false,"pairCode":"","position":1,"operation":""},"screen":8,"waitMs":0,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":180744,"isolated":true,"unlocked":true,"failCount":0,"pinCursor":9,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":23412,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] VLP tx type=16 seq=40 size=238
+[RocKey E2E] VLP rx type=17 seq=43 size=253
+[RocKey E2E] passed: App connection session limit confirmation
+[RocKey E2E] VLP tx type=16 seq=41 size=212
+[RocKey E2E] VLP rx type=17 seq=44 size=291
+[RocKey E2E] VLP tx type=16 seq=42 size=537
+[RocKey E2E] VLP tx type=16 seq=43 size=181
+[RocKey E2E] VLP rx type=17 seq=45 size=254
+[RocKey E2E] VLP tx type=16 seq=44 size=181
+[RocKey E2E] VLP tx type=16 seq=45 size=238
+[RocKey E2E] VLP rx type=17 seq=46 size=165
+[RocKey E2E] VLP rx type=17 seq=47 size=165
+[RocKey E2E] VLP rx type=17 seq=48 size=255
+[RocKey E2E] passed: within single/session limits: no review
+[RocKey E2E] VLP tx type=16 seq=46 size=212
+[RocKey E2E] VLP rx type=17 seq=49 size=291
+[RocKey E2E] VLP tx type=16 seq=47 size=537
+[RocKey E2E] VLP tx type=16 seq=48 size=181
+[RocKey E2E] VLP rx type=17 seq=50 size=253
+[RocKey E2E] VLP tx type=16 seq=49 size=238
+[RocKey E2E] VLP rx type=17 seq=51 size=165
+[RocKey E2E] VLP tx type=16 seq=50 size=181
+[RocKey E2E] VLP rx type=17 seq=52 size=271
+[RocKey E2E] passed: equal cumulative limit across two channels: no review
+[RocKey E2E] review request: sign-p2pkh 
+[RocKey E2E] VLP tx type=16 seq=51 size=212
+[RocKey E2E] VLP rx type=17 seq=53 size=165
+[RocKey E2E] VLP rx type=17 seq=54 size=291
+[RocKey E2E] VLP tx type=16 seq=52 size=537
+[RocKey E2E] VLP tx type=16 seq=53 size=181
+[RocKey E2E] VLP rx type=17 seq=55 size=165
+[RocKey E2E] VLP rx type=17 seq=56 size=171
+[RocKey E2E] Worker rejected: denied
+[RocKey E2E] VLP tx type=16 seq=54 size=181
+[RocKey E2E] VLP rx type=17 seq=57 size=165
+[RocKey E2E] VLP tx type=16 seq=55 size=181
+[RocKey E2E] VLP rx type=17 seq=58 size=165
+[RocKey E2E] denial button released: {"ui":{"pin":false,"read":true,"fault":"","lines":0,"raise":false,"pairing":false,"reviews":7,"visible":false,"canRaise":true,"pairCode":"","position":0,"operation":""},"screen":8,"waitMs":0,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":164264,"isolated":true,"unlocked":true,"failCount":0,"pinCursor":9,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":23412,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] review after buttons: {"ui":{"pin":false,"read":true,"fault":"","lines":0,"raise":false,"pairing":false,"reviews":7,"visible":false,"canRaise":true,"pairCode":"","position":0,"operation":""},"screen":8,"waitMs":0,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":164264,"isolated":true,"unlocked":true,"failCount":0,"pinCursor":9,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":23412,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] VLP tx type=16 seq=56 size=238
+[RocKey E2E] VLP rx type=17 seq=59 size=271
+[RocKey E2E] passed: over session total: deny produces no charge/signature
+[RocKey E2E] review request: sign-p2pkh 
+[RocKey E2E] VLP tx type=16 seq=57 size=212
+[RocKey E2E] VLP tx type=16 seq=58 size=181
+[RocKey E2E] VLP rx type=17 seq=60 size=165
+[RocKey E2E] VLP rx type=17 seq=61 size=291
+[RocKey E2E] VLP tx type=16 seq=59 size=537
+[RocKey E2E] VLP tx type=16 seq=60 size=181
+[RocKey E2E] VLP rx type=17 seq=62 size=165
+[RocKey E2E] VLP tx type=16 seq=61 size=181
+[RocKey E2E] VLP rx type=17 seq=63 size=165
+[RocKey E2E] VLP tx type=16 seq=62 size=181
+[RocKey E2E] VLP rx type=17 seq=64 size=165
+[RocKey E2E] VLP tx type=16 seq=63 size=181
+[RocKey E2E] VLP rx type=17 seq=65 size=165
+[RocKey E2E] VLP tx type=16 seq=64 size=181
+[RocKey E2E] VLP rx type=17 seq=66 size=165
+[RocKey E2E] VLP tx type=16 seq=65 size=181
+[RocKey E2E] VLP rx type=17 seq=67 size=165
+[RocKey E2E] VLP tx type=16 seq=66 size=181
+[RocKey E2E] VLP rx type=17 seq=68 size=165
+[RocKey E2E] VLP tx type=16 seq=67 size=181
+[RocKey E2E] VLP rx type=17 seq=69 size=165
+[RocKey E2E] VLP tx type=16 seq=68 size=181
+[RocKey E2E] VLP rx type=17 seq=70 size=165
+[RocKey E2E] VLP tx type=16 seq=69 size=181
+[RocKey E2E] VLP rx type=17 seq=71 size=165
+[RocKey E2E] VLP tx type=16 seq=70 size=181
+[RocKey E2E] VLP rx type=17 seq=72 size=165
+[RocKey E2E] VLP tx type=16 seq=71 size=181
+[RocKey E2E] VLP rx type=17 seq=73 size=165
+[RocKey E2E] VLP tx type=16 seq=72 size=181
+[RocKey E2E] VLP rx type=17 seq=74 size=165
+[RocKey E2E] VLP tx type=16 seq=73 size=181
+[RocKey E2E] VLP rx type=17 seq=75 size=165
+[RocKey E2E] VLP tx type=16 seq=74 size=181
+[RocKey E2E] VLP rx type=17 seq=76 size=165
+[RocKey E2E] VLP tx type=16 seq=75 size=181
+[RocKey E2E] VLP rx type=17 seq=77 size=252
+[RocKey E2E] VLP rx type=17 seq=78 size=165
+[RocKey E2E] VLP tx type=16 seq=76 size=181
+[RocKey E2E] VLP rx type=17 seq=79 size=165
+[RocKey E2E] review after buttons: {"ui":{"pin":false,"read":true,"fault":"","lines":0,"raise":false,"pairing":false,"reviews":8,"visible":false,"canRaise":true,"pairCode":"","position":20,"operation":""},"screen":8,"waitMs":0,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":163976,"isolated":true,"unlocked":true,"failCount":0,"pinCursor":9,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":23412,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] VLP tx type=16 seq=77 size=238
+[RocKey E2E] VLP rx type=17 seq=80 size=271
+[RocKey E2E] passed: over session total: one-time approval keeps configured limit
+[RocKey E2E] review request: sign-p2pkh 
+[RocKey E2E] VLP tx type=16 seq=78 size=212
+[RocKey E2E] VLP tx type=16 seq=79 size=181
+[RocKey E2E] VLP rx type=17 seq=81 size=165
+[RocKey E2E] VLP rx type=17 seq=82 size=291
+[RocKey E2E] VLP tx type=16 seq=80 size=537
+[RocKey E2E] VLP tx type=16 seq=81 size=181
+[RocKey E2E] VLP rx type=17 seq=83 size=165
+[RocKey E2E] VLP tx type=16 seq=82 size=181
+[RocKey E2E] VLP rx type=17 seq=84 size=165
+[RocKey E2E] VLP tx type=16 seq=83 size=181
+[RocKey E2E] VLP rx type=17 seq=85 size=165
+[RocKey E2E] VLP tx type=16 seq=84 size=181
+[RocKey E2E] VLP rx type=17 seq=86 size=165
+[RocKey E2E] VLP tx type=16 seq=85 size=181
+[RocKey E2E] VLP rx type=17 seq=87 size=165
+[RocKey E2E] VLP tx type=16 seq=86 size=181
+[RocKey E2E] VLP rx type=17 seq=88 size=165
+[RocKey E2E] VLP tx type=16 seq=87 size=181
+[RocKey E2E] VLP rx type=17 seq=89 size=165
+[RocKey E2E] VLP tx type=16 seq=88 size=181
+[RocKey E2E] VLP rx type=17 seq=90 size=165
+[RocKey E2E] VLP tx type=16 seq=89 size=181
+[RocKey E2E] VLP rx type=17 seq=91 size=165
+[RocKey E2E] VLP tx type=16 seq=90 size=181
+[RocKey E2E] VLP rx type=17 seq=92 size=165
+[RocKey E2E] VLP tx type=16 seq=91 size=181
+[RocKey E2E] VLP rx type=17 seq=93 size=165
+[RocKey E2E] VLP tx type=16 seq=92 size=181
+[RocKey E2E] VLP rx type=17 seq=94 size=165
+[RocKey E2E] VLP tx type=16 seq=93 size=181
+[RocKey E2E] VLP rx type=17 seq=95 size=165
+[RocKey E2E] VLP tx type=16 seq=94 size=181
+[RocKey E2E] VLP rx type=17 seq=96 size=165
+[RocKey E2E] VLP tx type=16 seq=95 size=181
+[RocKey E2E] VLP rx type=17 seq=97 size=165
+[RocKey E2E] VLP tx type=16 seq=96 size=181
+[RocKey E2E] VLP rx type=17 seq=98 size=165
+[RocKey E2E] VLP tx type=16 seq=97 size=181
+[RocKey E2E] VLP rx type=17 seq=99 size=165
+[RocKey E2E] VLP tx type=16 seq=98 size=181
+[RocKey E2E] VLP rx type=17 seq=100 size=165
+[RocKey E2E] VLP tx type=16 seq=99 size=181
+[RocKey E2E] VLP rx type=17 seq=101 size=252
+[RocKey E2E] VLP rx type=17 seq=102 size=165
+[RocKey E2E] VLP tx type=16 seq=100 size=181
+[RocKey E2E] VLP rx type=17 seq=103 size=165
+[RocKey E2E] review after buttons: {"ui":{"pin":false,"read":true,"fault":"","lines":0,"raise":true,"pairing":false,"reviews":9,"visible":false,"canRaise":true,"pairCode":"","position":20,"operation":""},"screen":8,"waitMs":0,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":163800,"isolated":true,"unlocked":true,"failCount":0,"pinCursor":9,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":23412,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] VLP tx type=16 seq=101 size=238
+[RocKey E2E] VLP rx type=17 seq=104 size=271
+[RocKey E2E] VLP tx type=16 seq=102 size=190
+[RocKey E2E] VLP rx type=17 seq=105 size=731
+[RocKey E2E] VLP rx type=17 seq=106 size=516
+[RocKey E2E] passed: increase current session limit while confirming
+[RocKey E2E] VLP tx type=16 seq=103 size=211
+[RocKey E2E] VLP tx type=16 seq=104 size=181
+[RocKey E2E] VLP rx type=17 seq=107 size=291
+[RocKey E2E] VLP tx type=16 seq=105 size=499
+[RocKey E2E] VLP rx type=17 seq=108 size=165
+[RocKey E2E] VLP rx type=17 seq=109 size=254
+[RocKey E2E] VLP tx type=16 seq=106 size=211
+[RocKey E2E] VLP rx type=17 seq=110 size=291
+[RocKey E2E] VLP tx type=16 seq=107 size=499
+[RocKey E2E] VLP tx type=16 seq=108 size=181
+[RocKey E2E] VLP rx type=17 seq=111 size=254
+[RocKey E2E] passed: plugin single-limit equality remains automatic without total limit
+[RocKey E2E] VLP tx type=16 seq=109 size=181
+[RocKey E2E] VLP tx type=16 seq=110 size=211
+[RocKey E2E] VLP rx type=17 seq=112 size=165
+[RocKey E2E] VLP rx type=17 seq=113 size=165
+[RocKey E2E] VLP rx type=17 seq=114 size=291
+[RocKey E2E] VLP tx type=16 seq=111 size=499
+[RocKey E2E] VLP tx type=16 seq=112 size=181
+[RocKey E2E] VLP rx type=17 seq=115 size=252
+[RocKey E2E] VLP tx type=16 seq=113 size=211
+[RocKey E2E] VLP rx type=17 seq=116 size=165
+[RocKey E2E] VLP rx type=17 seq=117 size=291
+[RocKey E2E] VLP tx type=16 seq=114 size=499
+[RocKey E2E] VLP rx type=17 seq=118 size=178
+[RocKey E2E] Worker rejected: request-reuse
+[RocKey E2E] passed: completed paymentId cannot sign or charge twice
+[RocKey E2E] review request: sign-p2pkh 
+[RocKey E2E] VLP tx type=16 seq=115 size=211
+[RocKey E2E] VLP rx type=17 seq=119 size=291
+[RocKey E2E] VLP tx type=16 seq=116 size=499
+[RocKey E2E] VLP tx type=16 seq=117 size=181
+[RocKey E2E] VLP rx type=17 seq=120 size=165
+[RocKey E2E] VLP rx type=17 seq=121 size=171
+[RocKey E2E] Worker rejected: denied
+[RocKey E2E] VLP tx type=16 seq=118 size=181
+[RocKey E2E] VLP rx type=17 seq=122 size=165
+[RocKey E2E] VLP tx type=16 seq=119 size=181
+[RocKey E2E] denial button released: {"ui":{"pin":false,"read":true,"fault":"","lines":0,"raise":false,"pairing":false,"reviews":10,"visible":false,"canRaise":false,"pairCode":"","position":0,"operation":""},"screen":8,"waitMs":0,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":163096,"isolated":true,"unlocked":true,"failCount":0,"pinCursor":9,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":23412,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] VLP rx type=17 seq=123 size=165
+[RocKey E2E] review after buttons: {"ui":{"pin":false,"read":true,"fault":"","lines":0,"raise":false,"pairing":false,"reviews":10,"visible":false,"canRaise":false,"pairCode":"","position":0,"operation":""},"screen":8,"waitMs":0,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":163624,"isolated":true,"unlocked":true,"failCount":0,"pinCursor":9,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":23412,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] review request: sign-p2pkh 
+[RocKey E2E] VLP tx type=16 seq=120 size=211
+[RocKey E2E] VLP rx type=17 seq=124 size=291
+[RocKey E2E] VLP tx type=16 seq=121 size=499
+[RocKey E2E] VLP tx type=16 seq=122 size=181
+[RocKey E2E] VLP rx type=17 seq=125 size=165
+[RocKey E2E] VLP tx type=16 seq=123 size=181
+[RocKey E2E] VLP rx type=17 seq=126 size=165
+[RocKey E2E] VLP tx type=16 seq=124 size=181
+[RocKey E2E] VLP rx type=17 seq=127 size=165
+[RocKey E2E] VLP tx type=16 seq=125 size=181
+[RocKey E2E] VLP rx type=17 seq=128 size=165
+[RocKey E2E] VLP tx type=16 seq=126 size=181
+[RocKey E2E] VLP rx type=17 seq=129 size=165
+[RocKey E2E] VLP tx type=16 seq=127 size=181
+[RocKey E2E] VLP rx type=17 seq=130 size=165
+[RocKey E2E] VLP tx type=16 seq=128 size=181
+[RocKey E2E] VLP rx type=17 seq=131 size=165
+[RocKey E2E] VLP tx type=16 seq=129 size=181
+[RocKey E2E] VLP rx type=17 seq=132 size=165
+[RocKey E2E] VLP tx type=16 seq=130 size=181
+[RocKey E2E] VLP rx type=17 seq=133 size=165
+[RocKey E2E] VLP tx type=16 seq=131 size=181
+[RocKey E2E] VLP rx type=17 seq=134 size=165
+[RocKey E2E] VLP tx type=16 seq=132 size=181
+[RocKey E2E] VLP rx type=17 seq=135 size=254
+[RocKey E2E] VLP rx type=17 seq=136 size=165
+[RocKey E2E] VLP tx type=16 seq=133 size=181
+[RocKey E2E] VLP rx type=17 seq=137 size=165
+[RocKey E2E] review after buttons: {"ui":{"pin":false,"read":true,"fault":"","lines":0,"raise":false,"pairing":false,"reviews":11,"visible":false,"canRaise":false,"pairCode":"","position":20,"operation":""},"screen":8,"waitMs":0,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":163424,"isolated":true,"unlocked":true,"failCount":0,"pinCursor":9,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":23412,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] passed: plugin over single limit: deny then allow
+[RocKey E2E] VLP tx type=16 seq=134 size=211
+[RocKey E2E] VLP rx type=17 seq=138 size=291
+[RocKey E2E] VLP tx type=16 seq=135 size=499
+[RocKey E2E] VLP tx type=16 seq=136 size=181
+[RocKey E2E] VLP rx type=17 seq=139 size=165
+[RocKey E2E] VLP tx type=16 seq=137 size=181
+[RocKey E2E] VLP rx type=17 seq=140 size=165
+[RocKey E2E] VLP tx type=16 seq=138 size=181
+[RocKey E2E] VLP rx type=17 seq=141 size=165
+[RocKey E2E] VLP tx type=16 seq=139 size=181
+[RocKey E2E] VLP rx type=17 seq=142 size=165
+[RocKey E2E] VLP tx type=16 seq=140 size=181
+[RocKey E2E] VLP rx type=17 seq=143 size=165
+[RocKey E2E] VLP tx type=16 seq=141 size=181
+[RocKey E2E] VLP rx type=17 seq=144 size=165
+[RocKey E2E] VLP tx type=16 seq=142 size=181
+[RocKey E2E] VLP rx type=17 seq=145 size=165
+[RocKey E2E] VLP tx type=16 seq=143 size=181
+[RocKey E2E] VLP rx type=17 seq=146 size=165
+[RocKey E2E] VLP tx type=16 seq=144 size=181
+[RocKey E2E] VLP rx type=17 seq=147 size=165
+[RocKey E2E] VLP tx type=16 seq=145 size=181
+[RocKey E2E] VLP rx type=17 seq=148 size=165
+[RocKey E2E] VLP tx type=16 seq=146 size=181
+[RocKey E2E] VLP rx type=17 seq=149 size=165
+[RocKey E2E] VLP tx type=16 seq=147 size=181
+[RocKey E2E] VLP rx type=17 seq=150 size=165
+[RocKey E2E] VLP tx type=16 seq=148 size=181
+[RocKey E2E] VLP rx type=17 seq=151 size=165
+[RocKey E2E] VLP tx type=16 seq=149 size=181
+[RocKey E2E] VLP rx type=17 seq=152 size=165
+[RocKey E2E] VLP tx type=16 seq=150 size=181
+[RocKey E2E] VLP rx type=17 seq=153 size=165
+[RocKey E2E] VLP rx type=17 seq=154 size=253
+[RocKey E2E] VLP tx type=16 seq=151 size=181
+[RocKey E2E] VLP rx type=17 seq=155 size=165
+[RocKey E2E] passed: review requires scrolling; short B cannot authorize
+[RocKey E2E] VLP tx type=16 seq=152 size=238
+[RocKey E2E] VLP rx type=17 seq=156 size=271
+[RocKey E2E] VLP tx type=16 seq=153 size=212
+[RocKey E2E] VLP rx type=17 seq=157 size=291
+[RocKey E2E] VLP tx type=16 seq=154 size=537
+[RocKey E2E] VLP tx type=16 seq=155 size=181
+[RocKey E2E] VLP rx type=17 seq=158 size=165
+[RocKey E2E] VLP tx type=16 seq=156 size=240
+[RocKey E2E] VLP rx type=17 seq=159 size=174
+[RocKey E2E] Worker rejected: payment-cancelled
+[RocKey E2E] VLP rx type=17 seq=160 size=200
+[RocKey E2E] VLP tx type=16 seq=157 size=238
+[RocKey E2E] VLP rx type=17 seq=161 size=271
+[RocKey E2E] passed: cancel pending App payment clears review and retains ledger
+[RocKey E2E] VLP tx type=16 seq=158 size=190
+[RocKey E2E] VLP rx type=17 seq=162 size=731
+[RocKey E2E] VLP rx type=17 seq=163 size=516
+[RocKey E2E] review request: configure e2e.standard
+[RocKey E2E] VLP tx type=16 seq=159 size=329
+[RocKey E2E] VLP tx type=16 seq=160 size=181
+[RocKey E2E] VLP rx type=17 seq=164 size=165
+[RocKey E2E] VLP tx type=16 seq=161 size=181
+[RocKey E2E] VLP rx type=17 seq=165 size=165
+[RocKey E2E] VLP tx type=16 seq=162 size=181
+[RocKey E2E] VLP rx type=17 seq=166 size=165
+[RocKey E2E] VLP tx type=16 seq=163 size=181
+[RocKey E2E] VLP rx type=17 seq=167 size=165
+[RocKey E2E] VLP tx type=16 seq=164 size=181
+[RocKey E2E] VLP rx type=17 seq=168 size=165
+[RocKey E2E] VLP tx type=16 seq=165 size=181
+[RocKey E2E] VLP rx type=17 seq=169 size=165
+[RocKey E2E] VLP rx type=17 seq=170 size=180
+[RocKey E2E] VLP tx type=16 seq=166 size=181
+[RocKey E2E] VLP rx type=17 seq=171 size=165
+[RocKey E2E] VLP tx type=16 seq=167 size=181
+[RocKey E2E] VLP rx type=17 seq=172 size=165
+[RocKey E2E] review after buttons: {"ui":{"pin":false,"read":true,"fault":"","lines":0,"raise":false,"pairing":false,"reviews":14,"visible":false,"canRaise":false,"pairCode":"","position":6,"operation":""},"screen":8,"waitMs":0,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":163836,"isolated":true,"unlocked":true,"failCount":0,"pinCursor":9,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":23412,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] VLP tx type=16 seq=168 size=213
+[RocKey E2E] VLP rx type=17 seq=173 size=300
+[RocKey E2E] VLP tx type=16 seq=169 size=504
+[RocKey E2E] VLP tx type=16 seq=170 size=181
+[RocKey E2E] VLP rx type=17 seq=174 size=253
+[RocKey E2E] passed: standard BSV payment uses product signing profile
+[RocKey E2E] VLP tx type=16 seq=171 size=190
+[RocKey E2E] VLP rx type=17 seq=175 size=165
+[RocKey E2E] VLP rx type=17 seq=176 size=731
+[RocKey E2E] VLP rx type=17 seq=177 size=516
+[RocKey E2E] review request: configure connect.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.feepool.connect.main
+[RocKey E2E] VLP tx type=16 seq=172 size=414
+[RocKey E2E] VLP tx type=16 seq=173 size=181
+[RocKey E2E] VLP rx type=17 seq=178 size=165
+[RocKey E2E] VLP tx type=16 seq=174 size=181
+[RocKey E2E] VLP rx type=17 seq=179 size=165
+[RocKey E2E] VLP tx type=16 seq=175 size=181
+[RocKey E2E] VLP rx type=17 seq=180 size=165
+[RocKey E2E] VLP tx type=16 seq=176 size=181
+[RocKey E2E] VLP rx type=17 seq=181 size=165
+[RocKey E2E] VLP tx type=16 seq=177 size=181
+[RocKey E2E] VLP rx type=17 seq=182 size=165
+[RocKey E2E] VLP tx type=16 seq=178 size=181
+[RocKey E2E] VLP rx type=17 seq=183 size=165
+[RocKey E2E] VLP tx type=16 seq=179 size=181
+[RocKey E2E] VLP rx type=17 seq=184 size=165
+[RocKey E2E] VLP tx type=16 seq=180 size=181
+[RocKey E2E] VLP rx type=17 seq=185 size=165
+[RocKey E2E] VLP tx type=16 seq=181 size=181
+[RocKey E2E] VLP rx type=17 seq=186 size=165
+[RocKey E2E] VLP tx type=16 seq=182 size=181
+[RocKey E2E] VLP rx type=17 seq=187 size=180
+[RocKey E2E] VLP rx type=17 seq=188 size=165
+[RocKey E2E] VLP tx type=16 seq=183 size=181
+[RocKey E2E] review after buttons: {"ui":{"pin":false,"read":true,"fault":"","lines":0,"raise":false,"pairing":false,"reviews":15,"visible":false,"canRaise":false,"pairCode":"","position":9,"operation":""},"screen":8,"waitMs":0,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":163408,"isolated":true,"unlocked":true,"failCount":0,"pinCursor":9,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":23412,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] VLP tx type=16 seq=184 size=295
+[RocKey E2E] VLP rx type=17 seq=189 size=165
+[RocKey E2E] VLP rx type=17 seq=190 size=385
+[RocKey E2E] VLP tx type=16 seq=185 size=642
+[RocKey E2E] VLP tx type=16 seq=186 size=181
+[RocKey E2E] VLP rx type=17 seq=191 size=251
+[RocKey E2E] VLP tx type=16 seq=187 size=295
+[RocKey E2E] VLP rx type=17 seq=192 size=165
+[RocKey E2E] VLP rx type=17 seq=193 size=385
+[RocKey E2E] VLP tx type=16 seq=188 size=262
+[RocKey E2E] VLP rx type=17 seq=194 size=248
+[RocKey E2E] VLP tx type=16 seq=189 size=783
+[RocKey E2E] VLP tx type=16 seq=190 size=181
+[RocKey E2E] VLP rx type=17 seq=195 size=253
+[RocKey E2E] VLP tx type=16 seq=191 size=295
+[RocKey E2E] VLP rx type=17 seq=196 size=165
+[RocKey E2E] VLP rx type=17 seq=197 size=385
+[RocKey E2E] VLP tx type=16 seq=192 size=262
+[RocKey E2E] VLP rx type=17 seq=198 size=282
+[RocKey E2E] VLP tx type=16 seq=193 size=783
+[RocKey E2E] VLP tx type=16 seq=194 size=181
+[RocKey E2E] VLP rx type=17 seq=199 size=252
+[RocKey E2E] VLP tx type=16 seq=195 size=295
+[RocKey E2E] VLP rx type=17 seq=200 size=165
+[RocKey E2E] VLP rx type=17 seq=201 size=385
+[RocKey E2E] VLP tx type=16 seq=196 size=262
+[RocKey E2E] VLP rx type=17 seq=202 size=282
+[RocKey E2E] VLP tx type=16 seq=197 size=783
+[RocKey E2E] VLP tx type=16 seq=198 size=181
+[RocKey E2E] VLP rx type=17 seq=203 size=251
+[RocKey E2E] passed: connect fee pool funding and cumulative incremental payment
+[RocKey E2E] VLP tx type=16 seq=199 size=190
+[RocKey E2E] VLP rx type=17 seq=204 size=165
+[RocKey E2E] VLP rx type=17 seq=205 size=731
+[RocKey E2E] VLP rx type=17 seq=206 size=516
+[RocKey E2E] review request: configure bitfs.buyer.main
+[RocKey E2E] VLP tx type=16 seq=200 size=334
+[RocKey E2E] VLP tx type=16 seq=201 size=181
+[RocKey E2E] VLP rx type=17 seq=207 size=165
+[RocKey E2E] VLP tx type=16 seq=202 size=181
+[RocKey E2E] VLP rx type=17 seq=208 size=165
+[RocKey E2E] VLP tx type=16 seq=203 size=181
+[RocKey E2E] VLP rx type=17 seq=209 size=165
+[RocKey E2E] VLP tx type=16 seq=204 size=181
+[RocKey E2E] VLP rx type=17 seq=210 size=165
+[RocKey E2E] VLP tx type=16 seq=205 size=181
+[RocKey E2E] VLP rx type=17 seq=211 size=165
+[RocKey E2E] VLP rx type=17 seq=212 size=180
+[RocKey E2E] VLP tx type=16 seq=206 size=181
+[RocKey E2E] VLP rx type=17 seq=213 size=165
+[RocKey E2E] review after buttons: {"ui":{"pin":false,"read":true,"fault":"","lines":0,"raise":false,"pairing":false,"reviews":16,"visible":false,"canRaise":false,"pairCode":"","position":6,"operation":""},"screen":8,"waitMs":0,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":161976,"isolated":true,"unlocked":true,"failCount":0,"pinCursor":9,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":23412,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] VLP tx type=16 seq=207 size=217
+[RocKey E2E] VLP rx type=17 seq=214 size=305
+[RocKey E2E] VLP tx type=16 seq=208 size=596
+[RocKey E2E] VLP tx type=16 seq=209 size=181
+[RocKey E2E] VLP rx type=17 seq=215 size=252
+[RocKey E2E] VLP tx type=16 seq=210 size=217
+[RocKey E2E] VLP rx type=17 seq=216 size=165
+[RocKey E2E] VLP rx type=17 seq=217 size=305
+[RocKey E2E] VLP tx type=16 seq=211 size=262
+[RocKey E2E] VLP rx type=17 seq=218 size=248
+[RocKey E2E] VLP tx type=16 seq=212 size=772
+[RocKey E2E] VLP tx type=16 seq=213 size=181
+[RocKey E2E] VLP rx type=17 seq=219 size=165
+[RocKey E2E] VLP rx type=17 seq=220 size=252
+[RocKey E2E] VLP tx type=16 seq=214 size=217
+[RocKey E2E] VLP tx type=16 seq=215 size=181
+[RocKey E2E] VLP rx type=17 seq=221 size=305
+[RocKey E2E] VLP tx type=16 seq=216 size=262
+[RocKey E2E] VLP rx type=17 seq=222 size=165
+[RocKey E2E] VLP rx type=17 seq=223 size=282
+[RocKey E2E] VLP tx type=16 seq=217 size=772
+[RocKey E2E] VLP tx type=16 seq=218 size=181
+[RocKey E2E] VLP rx type=17 seq=224 size=253
+[RocKey E2E] VLP tx type=16 seq=219 size=217
+[RocKey E2E] VLP rx type=17 seq=225 size=165
+[RocKey E2E] VLP rx type=17 seq=226 size=305
+[RocKey E2E] VLP tx type=16 seq=220 size=262
+[RocKey E2E] VLP rx type=17 seq=227 size=282
+[RocKey E2E] VLP tx type=16 seq=221 size=772
+[RocKey E2E] VLP tx type=16 seq=222 size=181
+[RocKey E2E] VLP rx type=17 seq=228 size=252
+[RocKey E2E] passed: bitfs fee pool funding and cumulative incremental payment
+[RocKey E2E] VLP tx type=16 seq=223 size=238
+[RocKey E2E] VLP rx type=17 seq=229 size=165
+[RocKey E2E] VLP rx type=17 seq=230 size=271
+[RocKey E2E] VLP tx type=16 seq=224 size=239
+[RocKey E2E] VLP rx type=17 seq=231 size=166
+[RocKey E2E] VLP tx type=16 seq=225 size=181
+[RocKey E2E] VLP tx type=16 seq=226 size=238
+[RocKey E2E] VLP rx type=17 seq=232 size=165
+[RocKey E2E] VLP rx type=17 seq=233 size=271
+[RocKey E2E] VLP tx type=16 seq=227 size=212
+[RocKey E2E] VLP rx type=17 seq=234 size=291
+[RocKey E2E] VLP tx type=16 seq=228 size=537
+[RocKey E2E] VLP rx type=17 seq=235 size=180
+[RocKey E2E] Worker rejected: invalid-session
+[RocKey E2E] passed: close App connection retains total and forbids further payment
+[RocKey E2E] VLP tx type=16 seq=229 size=190
+[RocKey E2E] VLP tx type=16 seq=230 size=181
+[RocKey E2E] VLP rx type=17 seq=236 size=731
+[RocKey E2E] VLP rx type=17 seq=237 size=516
+[RocKey E2E] VLP tx type=16 seq=231 size=238
+[RocKey E2E] VLP rx type=17 seq=238 size=165
+[RocKey E2E] VLP rx type=17 seq=239 size=271
+[RocKey E2E] device before USB close: {"ui":{"pin":false,"read":true,"fault":"","lines":0,"raise":false,"pairing":false,"reviews":16,"visible":false,"canRaise":false,"pairCode":"","position":6,"operation":""},"screen":8,"waitMs":0,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":160348,"isolated":true,"unlocked":true,"failCount":0,"pinCursor":9,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":23412,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] device ready: {"ui":{"pin":false,"read":true,"fault":"","lines":0,"raise":false,"pairing":false,"reviews":0,"visible":false,"canRaise":false,"pairCode":"","position":0,"operation":""},"screen":1,"waitMs":0,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":217372,"isolated":true,"unlocked":false,"failCount":0,"pinCursor":0,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":25732,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] entering normal PIN
+[RocKey E2E] waiting for host pairing
+[RocKey E2E] VLP tx type=1 seq=0 size=185
+[RocKey E2E] VLP rx type=2 seq=0 size=204
+[RocKey E2E] waiting for device pairing
+[RocKey E2E] VLP tx type=3 seq=1 size=29
+[RocKey E2E] applying device pairing approval
+[RocKey E2E] VLP rx type=4 seq=1 size=25
+[RocKey E2E] VLP tx type=5 seq=2 size=61
+[RocKey E2E] VLP rx type=6 seq=2 size=217
+[RocKey E2E] VLP tx type=16 seq=3 size=179
+[RocKey E2E] VLP tx type=16 seq=4 size=188
+[RocKey E2E] VLP rx type=17 seq=3 size=163
+[RocKey E2E] VLP rx type=17 seq=4 size=731
+[RocKey E2E] VLP rx type=17 seq=5 size=514
+[RocKey E2E] VLP tx type=16 seq=5 size=236
+[RocKey E2E] VLP rx type=17 seq=6 size=269
+[RocKey E2E] passed: ESP32 restart preserves channels and closed session ledger
+[RocKey E2E] device before USB close: {"ui":{"pin":false,"read":true,"fault":"","lines":2,"raise":false,"pairing":true,"reviews":1,"visible":false,"canRaise":false,"pairCode":"151362","position":0,"operation":""},"screen":8,"waitMs":0,"buildId":"rockey-e2e-20261010T164714584Z","firmware":"rockey-product-e2e-v1","freeHeap":169300,"isolated":true,"unlocked":true,"failCount":0,"pinCursor":7,"publicKey":"03b77904f513422f79d644fccea983fb823ae099de0ea8b5deae6b4b7cdfbf611a","rxDropped":0,"stackFree":25652,"pinEntered":0,"initialized":true,"serialErrors":0,"selftestFailed":false}
+[RocKey E2E] device before USB close unavailable: test-link-closed
+  ✓  1 integration/rockey/hardware.spec.mjs:3:1 › Keymaster Worker ↔ real USB ↔ RocKey product UI and persistent signing policy (6.6m)
+
+  Slow test file: integration/rockey/hardware.spec.mjs (6.6m)
+  Consider running tests from slow files in parallel. See: https://playwright.dev/docs/test-parallel
+  1 passed (6.6m)

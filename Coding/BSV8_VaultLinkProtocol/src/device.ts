@@ -1,10 +1,14 @@
+import {fragments, FragmentAssembler, MAX_MESSAGE} from "./fragments.js";
 import { equal, fail, ProtocolError } from "./bytes.js";
 import { decode, encode, object, type Value } from "./cbor.js";
 import { commitment } from "./crypto.js";
 import { Type } from "./frame.js";
 import { RequestGate } from "./requests.js";
 import { type ReadySession } from "./session.js";
+import {wipeResultBytes} from "./secret-value.js";
 export interface OperationHandler {
+  /** False for one-time private material: queries/replays retain status only. */
+  retainResult?: boolean;
   profile: string;
   version: number;
   /** verify 返回 Profile 完整规范核心，禁止主机挑选字段。 */ verify(
@@ -15,7 +19,9 @@ export interface OperationHandler {
 }
 /** SDK 只登记真实操作。设备持续读取控制消息，业务执行不阻塞取消/状态查询；单业务槽由 Gate 强制。 */
 export class DeviceServer {
+  private assembler = new FragmentAssembler();
   private gate = new RequestGate();
+  private sending: Promise<void> = Promise.resolve();
   private stopped = false;
   private active: Promise<void> | undefined;
   private operations = new Map<string, OperationHandler>();
@@ -34,7 +40,11 @@ export class DeviceServer {
       while (!this.stopped) {
         const f = await this.session.link.read(8000);
         if (f.type !== Type.REQUEST) fail("invalid-message");
-        const r = object(decode(await this.session.keys.receive.open(f)), [
+        const plain=await this.session.keys.receive.open(f);
+        let message: Value | undefined;
+        try{message=await this.assembler.accept(plain,f.type);}finally{plain.fill(0);}
+        if (message === undefined) continue;
+        const r = object(message, [
           "op",
           "opVersion",
           "body",
@@ -105,9 +115,16 @@ export class DeviceServer {
       if (this.stopped || this.abort.signal.aborted) return;
       this.gate.start(r.requestId as number);
       const result = await handler.execute(core, this.abort.signal);
-      if (this.stopped) return;
-      this.gate.complete(r.requestId as number, encode(result));
-      await this.respond(r, result);
+      if (this.stopped){if(handler.retainResult===false)wipeResultBytes(result);return;}
+      let encoded: Uint8Array | undefined;
+      try {
+        encoded = encode(result, MAX_MESSAGE);
+        this.gate.complete(r.requestId as number, encoded, handler.retainResult !== false);
+        await this.respond(r, result);
+      } finally {
+        encoded?.fill(0);
+        if (handler.retainResult === false) wipeResultBytes(result);
+      }
     } catch (e) {
       if (!this.stopped) {
         try {
@@ -151,6 +168,7 @@ export class DeviceServer {
           : this.gate.cancel(b.requestId, b.commitment);
       if (r.op === "system.cancel" && result?.state === "cancelled")
         this.abort?.abort();
+    this.assembler.close();
       await this.respond(
         r,
         result
@@ -177,22 +195,21 @@ export class DeviceServer {
     r: Record<string, Value>,
     payload: Value,
   ): Promise<void> {
-    await this.session.link.send(
-      await this.session.keys.send.seal(
-        Type.RESPONSE,
-        encode({
-          requestId: r.requestId!,
-          binding: this.session.binding as unknown as Value,
-          commitment: r.commitment!,
-          payload,
-        }),
-      ),
-    );
+    const value = {requestId: r.requestId!, binding: this.session.binding as unknown as Value, commitment: r.commitment!, payload};
+    const sending = this.sending.then(async () => {
+      if (this.stopped) fail("disconnected");
+      const parts=await fragments(value);
+      try{for(const plain of parts)await this.session.link.send(await this.session.keys.send.seal(Type.RESPONSE,plain));}
+      finally{for(const plain of parts)plain.fill(0);}
+    });
+    this.sending = sending.catch(() => {});
+    await sending;
   }
   async close(): Promise<void> {
     if (this.stopped) return;
     this.stopped = true;
     this.abort?.abort();
+    this.assembler.close();
     this.gate.invalidate();
     this.session.keys.send.close();
     this.session.keys.receive.close();

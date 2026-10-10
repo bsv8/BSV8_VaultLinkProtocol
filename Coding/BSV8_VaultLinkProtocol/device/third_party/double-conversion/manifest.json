@@ -1,0 +1,30 @@
+{
+  "name": "google/double-conversion",
+  "version": "3.3.1",
+  "commit": "ae0dbfeb9744efd216c95b30555049d75d47116a",
+  "source": "https://github.com/google/double-conversion",
+  "license": "BSD-3-Clause",
+  "files": {
+    "string-to-double.h": "1976310fdd04e3bc350c5f8f4b443ba0287abb4004b318f048ac41611278e4c9",
+    "utils.h": "ab745c4b74fdd27d967d8026d082bff3ef59ca2ca581c163dcf266bebd413795",
+    "fixed-dtoa.h": "5c22077d3d333998b87c578aa1a015503d162895e20e5f2ee92721c834748ee1",
+    "bignum-dtoa.h": "d11517ebb69107c515c5b45d820e1a2ff665ac64182f62fdd25bac804acf1d1f",
+    "double-to-string.h": "7e2a5e08fd57f476e789d05b789ac0376ebbb78172ebcf68db493dc1e1e5e4ef",
+    "strtod.h": "08c3a8f9852b6e3399b694ead7511e0ecadc96a6a61431fc1f9df003f2ff41d8",
+    "diy-fp.h": "f8f5d66be5684ac547f68b997d41fdc57e8dc2ca1ef2ef2e3b10c6a76c9c5b75",
+    "cached-powers.h": "1da91324ffd4200b3cb41d1f0707277175cdd28fcbffa13104e14df431f00744",
+    "double-conversion.h": "2754e5e7ef1a158d00f529da03dcf943dd239ccc70e798a594f22e13e8dd0f94",
+    "ieee.h": "bc9a4adae492f692e19db9c279eac52d4933ddf872aff43056bceee42d65a8f5",
+    "bignum.h": "6b63faea13f36f6026b56855aa8d28329ba1a91c564b9abc94b21608ca42cbfb",
+    "fast-dtoa.h": "523d778935995dea5d21e59f55629ba40eaf68dedfe99e82b71efd4ae75f4e40",
+    "bignum.cc": "cc33c3775d66d138aa49ea5a18e73ad6766ecca17009225811c33cea64bcd11b",
+    "string-to-double.cc": "9aafd7e77a23164ee94903cfd16bd1e84344a5d7a18b4ee430e35e76568b108d",
+    "fixed-dtoa.cc": "6cbef46bd0f6a482f4c79e34d14e49b448094d85bcefc25177957d84b62b2144",
+    "strtod.cc": "923f15ce6bff38b9aaa1f3bced157c468978ac9443fbb781f0826daeae5cd4ee",
+    "fast-dtoa.cc": "c2042b7bdd218435bcb4881a86a033bbd5dddbb6bd386a3a099247ca67882440",
+    "double-to-string.cc": "a74266a3b5b69e5c563023d6d01d54e0b09eb57656257c2dadee04648a8b931d",
+    "cached-powers.cc": "f0cabcc74f54ca33072671cc6c2819e39e8cd9b55db508946f2bd5acc1b48367",
+    "bignum-dtoa.cc": "85a803ff5eaea5acc840182ab03dc1205b77519cb61d6615682314eb8aa90914",
+    "LICENSE": "4af93c12062c58058378de2397dc1c92bbff9ddfb1d583a01c84127557ce97ca"
+  }
+}

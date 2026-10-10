@@ -4,6 +4,7 @@ import { secp256k1 } from "@noble/curves/secp256k1";
 import {
   serializeTransaction,
   p2pkhScript,
+  p2pkhOutputAddress,
   sha256d,
   inspectP2pkh,
   DeviceIdentityKey,
@@ -13,6 +14,12 @@ import {
 const priv = unhex(
   "0000000000000000000000000000000000000000000000000000000000000001",
 );
+test('output display derives Base58Check from the actual script for mainnet and testnet', async()=>{
+  const script=p2pkhScript(secp256k1.getPublicKey(priv,true));
+  assert.equal(await p2pkhOutputAddress(script,'main'),'1BgGZ9tcN4rm9KBzDn7KprQz87SZ26SAMH');
+  assert.equal(await p2pkhOutputAddress(script,'test'),'mrCDrCybB6J1vRfbwM5hemdJz73FwDBC8r');
+  await assert.rejects(p2pkhOutputAddress(Uint8Array.of(0x6a),'main'),/unsupported-script/);
+});
 async function sample() {
   const pub = secp256k1.getPublicKey(priv, true),
     peer = secp256k1.getPublicKey(2n, true),

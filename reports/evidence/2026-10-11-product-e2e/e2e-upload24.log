@@ -1,0 +1,110 @@
+Processing m5stack-core-e2e-en (platform: espressif32@6.12.0; board: m5stack-core-esp32; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/m5stack-core-esp32.html
+PLATFORM: Espressif 32 (6.12.0) > M5Stack Core ESP32
+HARDWARE: ESP32 240MHz, 320KB RAM, 4MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20017.241212+sha.dcc1105b 
+ - tool-esptoolpy @ 2.40900.250804 (4.9.0) 
+ - tool-mkfatfs @ 2.0.1 
+ - tool-mklittlefs @ 1.203.210628 (2.3) 
+ - tool-mkspiffs @ 2.230.0 (2.30) 
+ - toolchain-xtensa-esp32 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 34 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- TFT_eSPI @ 2.5.43
+|-- LittleFS @ 2.0.0
+Building in release mode
+Retrieving maximum program size .pio/build/m5stack-core-e2e-en/firmware.elf
+Checking size .pio/build/m5stack-core-e2e-en/firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [===       ]  31.9% (used 104484 bytes from 327680 bytes)
+Flash: [======    ]  59.4% (used 1011305 bytes from 1703936 bytes)
+Configuring upload protocol...
+AVAILABLE: cmsis-dap, esp-bridge, esp-prog, espota, esptool, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa
+CURRENT: upload_protocol = esptool
+Looking for upload port...
+Using manually specified: /dev/cu.usbserial-02010546
+Uploading .pio/build/m5stack-core-e2e-en/firmware.bin
+esptool.py v4.9.0
+Serial port /dev/cu.usbserial-02010546
+Connecting....
+Chip is ESP32-D0WDQ6 (revision v1.0)
+Features: WiFi, BT, Dual Core, 240MHz, VRef calibration in efuse, Coding Scheme None
+Crystal is 40MHz
+MAC: 8c:aa:b5:84:03:88
+Uploading stub...
+Running stub...
+Stub running...
+Configuring flash size...
+Flash will be erased from 0x00001000 to 0x00005fff...
+Flash will be erased from 0x00008000 to 0x00008fff...
+Flash will be erased from 0x0000e000 to 0x0000ffff...
+Flash will be erased from 0x00010000 to 0x00106fff...
+SHA digest in image updated
+Compressed 18976 bytes to 13111...
+Writing at 0x00001000... (100 %)
+Wrote 18976 bytes (13111 compressed) at 0x00001000 in 1.4 seconds (effective 107.9 kbit/s)...
+Hash of data verified.
+Compressed 3072 bytes to 129...
+Writing at 0x00008000... (100 %)
+Wrote 3072 bytes (129 compressed) at 0x00008000 in 0.1 seconds (effective 416.1 kbit/s)...
+Hash of data verified.
+Compressed 8192 bytes to 47...
+Writing at 0x0000e000... (100 %)
+Wrote 8192 bytes (47 compressed) at 0x0000e000 in 0.1 seconds (effective 664.0 kbit/s)...
+Hash of data verified.
+Compressed 1011664 bytes to 582726...
+Writing at 0x00010000... (2 %)
+Writing at 0x00019c19... (5 %)
+Writing at 0x00023904... (8 %)
+Writing at 0x0002e7a2... (11 %)
+Writing at 0x00036931... (13 %)
+Writing at 0x0004a758... (16 %)
+Writing at 0x00051d0e... (19 %)
+Writing at 0x00056b22... (22 %)
+Writing at 0x0005bddc... (25 %)
+Writing at 0x0006191c... (27 %)
+Writing at 0x000676ab... (30 %)
+Writing at 0x0006dcaa... (33 %)
+Writing at 0x00073d7b... (36 %)
+Writing at 0x0007a518... (38 %)
+Writing at 0x00080732... (41 %)
+Writing at 0x000868c8... (44 %)
+Writing at 0x0008c797... (47 %)
+Writing at 0x00092283... (50 %)
+Writing at 0x000974da... (52 %)
+Writing at 0x0009c8ad... (55 %)
+Writing at 0x000a1e70... (58 %)
+Writing at 0x000a7e0c... (61 %)
+Writing at 0x000ad74c... (63 %)
+Writing at 0x000b301c... (66 %)
+Writing at 0x000b8857... (69 %)
+Writing at 0x000bd712... (72 %)
+Writing at 0x000c392d... (75 %)
+Writing at 0x000cb201... (77 %)
+Writing at 0x000d3052... (80 %)
+Writing at 0x000da5a8... (83 %)
+Writing at 0x000e0ac9... (86 %)
+Writing at 0x000e8b93... (88 %)
+Writing at 0x000f120f... (91 %)
+Writing at 0x000f9084... (94 %)
+Writing at 0x000fe5ed... (97 %)
+Writing at 0x00103b5b... (100 %)
+Wrote 1011664 bytes (582726 compressed) at 0x00010000 in 51.3 seconds (effective 157.7 kbit/s)...
+Hash of data verified.
+
+Leaving...
+Hard resetting via RTS pin...
+========================= [SUCCESS] Took 58.45 seconds =========================
+
+Environment          Status    Duration
+-------------------  --------  ------------
+m5stack-core-e2e-en  SUCCESS   00:00:58.452
+========================= 1 succeeded in 00:00:58.452 =========================
+uploaded prepared image: {'buildId': 'rockey-e2e-20261010T164714584Z', 'sha256': 'b2a1a5617e2cdeb7213b4b79e2c6fe0d3fc2a4ea203e15df6dadeda75f020970'}

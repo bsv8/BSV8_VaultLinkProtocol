@@ -1,0 +1,3 @@
+[release-scan] env=m5stack-core-en buildId=? elf=21240732 bytes
+  ok   已扫描 ELF 符号（7945 个），无测试按键 / 无通用盲签 / 无旧原始密钥入口（迁移导出另需 PIN 与实体确认）
+  ok   未发现秘密字符串

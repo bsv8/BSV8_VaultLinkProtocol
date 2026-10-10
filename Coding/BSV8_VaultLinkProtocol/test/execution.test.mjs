@@ -107,7 +107,7 @@ test("real atomic file persistence with P2PKH output-based policy: auto then cum
       Buffer.from(key.publicKey()).toString("hex"),
     );
     assert.equal((await restored.snapshot()).sessions[0].used, 600n);
-    assert.equal((await restored.snapshot()).sessions[0].active, false);
+    assert.equal((await restored.snapshot()).sessions[0].active, true);
   } finally {
     key.close();
     await rm(dir, { recursive: true, force: true });

@@ -1,5 +1,6 @@
 #pragma once
 #include <algorithm>
+#include <array>
 #include <cstdint>
 #include <stdexcept>
 #include <string>
@@ -14,6 +15,13 @@ inline void require(bool ok, const char *code) {
   if (!ok)
     throw Failure(code);
 }
+inline void wipe_bytes(Bytes &bytes) {
+  volatile uint8_t *p=bytes.data();for(size_t i=0;i<bytes.size();++i)p[i]=0;
+}
+struct WipeBytes {
+  Bytes &bytes;
+  ~WipeBytes(){wipe_bytes(bytes);}
+};
 // 有界通用值；仅协议处理使用，入口长度/层数/容器容量均先检查。
 struct Value {
   enum Kind {
@@ -32,6 +40,13 @@ struct Value {
   Bytes bytes;
   std::vector<Value> array;
   std::vector<std::pair<std::string, Value>> map;
+  // 协议值可含本地秘密。复制/替换/离开作用域均清理原字节，不留下明文结果缓存。
+  void wipe() {wipe_bytes(bytes);volatile char *p=text.data();for(size_t i=0;i<text.size();++i)p[i]=0;}
+  ~Value(){wipe();}
+  Value(const Value &)=default;
+  Value(Value &&) noexcept=default;
+  Value &operator=(const Value &v) {if(this!=&v){wipe();kind=v.kind;n=v.n;boolean=v.boolean;text=v.text;bytes=v.bytes;array=v.array;map=v.map;}return *this;}
+  Value &operator=(Value &&v) noexcept {if(this!=&v){wipe();kind=v.kind;n=v.n;boolean=v.boolean;text=std::move(v.text);bytes=std::move(v.bytes);array=std::move(v.array);map=std::move(v.map);}return *this;}
   Value() = default;
   Value(uint64_t v) : kind(Uint), n(v) {};
   Value(bool v) : kind(Bool), boolean(v) {}
@@ -56,6 +71,9 @@ struct Value {
       if (p.first == key)
         return p.second;
     throw Failure("missing-field");
+  }
+  Value &at(const std::string &key) {
+    return const_cast<Value&>(static_cast<const Value&>(*this).at(key));
   }
   uint64_t integer() const {
     require(kind == Uint, "invalid-integer");
@@ -151,45 +169,73 @@ inline void cbor_write(const Value &v, Bytes &b, size_t limit, unsigned depth) {
     b.insert(b.end(), v.bytes.begin(), v.bytes.end());
     break;
   case Value::Array:
-    require(depth < 6 && v.array.size() <= 256, "container-limit");
+    require(depth < 6 && v.array.size() <= (limit>=65536?512:256), "container-limit");
     cbor_head(b, 4, v.array.size());
     for (const auto &x : v.array)
       cbor_write(x, b, limit, depth + 1);
     break;
   case Value::Map: {
     require(depth < 6 && v.map.size() <= 24, "map-too-large");
-    auto items = v.map;
-    std::sort(items.begin(), items.end(), [](const auto &a, const auto &c) {
-      return key_less(a.first, c.first);
+    // Sorting copied Values duplicates every nested ledger array. The map is
+    // already bounded to 24 entries: sort stack-held references instead.
+    std::array<const std::pair<std::string, Value>*,24> items{};
+    for(size_t i=0;i<v.map.size();++i)items[i]=&v.map[i];
+    std::sort(items.begin(), items.begin()+v.map.size(), [](const auto *a, const auto *c) {
+      return key_less(a->first, c->first);
     });
-    cbor_head(b, 5, items.size());
-    std::string prev;
-    for (const auto &p : items) {
+    cbor_head(b, 5, v.map.size());
+    const std::string* prev=nullptr;
+    for (size_t i=0;i<v.map.size();++i) {
+      const auto &p=*items[i];
       require(p.first.size() > 0 && p.first.size() <= 31 &&
-                  (prev.empty() || key_less(prev, p.first)),
+                  (!prev || key_less(*prev, p.first)),
               "invalid-key");
       cbor_write(Value(p.first), b, limit, depth + 1);
       cbor_write(p.second, b, limit, depth + 1);
-      prev = p.first;
+      prev = &p.first;
     }
     break;
   }
   }
   require(b.size() <= limit, "message-too-large");
 }
+inline size_t cbor_size(const Value& v,size_t limit,unsigned depth=0) {
+  require(depth<=6,"depth-exceeded");
+  const auto head=[](uint64_t n)->size_t{return n<24?1:n<=255?2:n<=65535?3:n<=0xffffffff?5:9;};
+  size_t size=0;
+  const auto add=[&](size_t n){require(size<=limit&&n<=limit-size,"message-too-large");size+=n;};
+  switch(v.kind) {
+    case Value::Null: case Value::Bool:add(1);break;
+    case Value::Uint: case Value::Negative:add(head(v.n));break;
+    case Value::Text:add(head(v.text.size()));add(v.text.size());break;
+    case Value::Binary:add(head(v.bytes.size()));add(v.bytes.size());break;
+    case Value::Array:
+      require(depth<6&&v.array.size()<=(limit>=65536?512:256),"container-limit");
+      add(head(v.array.size()));for(const auto& child:v.array)add(cbor_size(child,limit,depth+1));break;
+    case Value::Map:
+      require(depth<6&&v.map.size()<=24,"map-too-large");
+      add(head(v.map.size()));for(const auto& item:v.map){add(head(item.first.size()));add(item.first.size());add(cbor_size(item.second,limit,depth+1));}break;
+  }
+  return size;
+}
 inline Bytes encode(const Value &v, size_t limit = 896) {
   Bytes b;
+  // One exact allocation: vector doubling otherwise retains the old buffer
+  // alongside the new one while a complete ledger tree is still live.
+  b.reserve(cbor_size(v,limit));
   cbor_write(v, b, limit, 0);
   return b;
 }
 class CborReader {
   const Bytes &b;
   size_t i = 0;
+  size_t nodes = 0, node_limit,array_limit;
   uint8_t take() {
     require(i < b.size(), "truncated");
     return b[i++];
   }
   Value read(unsigned depth) {
+    require(++nodes <= node_limit,"node-limit");
     require(depth <= 6, "depth-exceeded");
     uint8_t h = take(), m = h >> 5, ai = h & 31;
     if (m == 7) {
@@ -232,14 +278,17 @@ class CborReader {
     }
     require(depth < 6, "depth-exceeded");
     if (m == 4) {
-      require(n <= 256, "container-limit");
+      require(n <= array_limit, "container-limit");
+      require(n<=b.size()-i,"truncated");
       std::vector<Value> a;
+      a.reserve(size_t(n));
       while (n--)
         a.push_back(read(depth + 1));
       return Value::list(std::move(a));
     }
     require(n <= 24 && n * 2 <= b.size() - i, "map-too-large");
     std::vector<std::pair<std::string, Value>> o;
+    o.reserve(size_t(n));
     std::string previous;
     while (n--) {
       std::string k = read(depth + 1).string();
@@ -253,16 +302,16 @@ class CborReader {
   }
 
 public:
-  explicit CborReader(const Bytes &x) : b(x) {}
+  explicit CborReader(const Bytes &x,size_t maximum_nodes=SIZE_MAX,size_t maximum_array=256) : b(x),node_limit(maximum_nodes),array_limit(maximum_array) {}
   Value finish() {
     auto v = read(0);
     require(i == b.size(), "trailing-bytes");
     return v;
   }
 };
-inline Value decode(const Bytes &b, size_t limit = 896) {
+inline Value decode(const Bytes &b, size_t limit = 896,size_t maximum_nodes=SIZE_MAX) {
   require(b.size() <= limit, "message-too-large");
-  return CborReader(b).finish();
+  return CborReader(b,maximum_nodes,limit>=65536?512:256).finish();
 }
 inline Value obj(std::initializer_list<std::pair<std::string, Value>> v) {
   return Value::object(v);

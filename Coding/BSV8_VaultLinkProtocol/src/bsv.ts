@@ -4,7 +4,31 @@ import { sha256 as hash256 } from "@noble/hashes/sha256";
 import { addMoney, concat, equal, fail, fixed, money, u32 } from "./bytes.js";
 import { sha256d } from "./crypto.js";
 import { possessionDigest } from "./handshake.js";
+import {decode,encode,type Value} from './cbor.js';
 import { externalOutputAmount } from "./payment.js";
+/** 地址只从已核验的实际 P2PKH 输出生成，不采用主机给出的收款方标签。 */
+export async function p2pkhOutputAddress(
+  script: Uint8Array,
+  network: "main" | "test",
+): Promise<string> {
+  if (!p2pkh(script)) fail("unsupported-script");
+  const payload = concat(
+    Uint8Array.of(network === "main" ? 0 : 111),
+    script.slice(3, 23),
+  );
+  const encoded = concat(payload, (await sha256d(payload)).slice(0, 4));
+  const alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+  let value = 0n,
+    result = "",
+    zeros = 0;
+  for (const byte of encoded) value = value * 256n + BigInt(byte);
+  while (value) {
+    result = alphabet[Number(value % 58n)] + result;
+    value /= 58n;
+  }
+  while (zeros < encoded.length && encoded[zeros] === 0) zeros++;
+  return "1".repeat(zeros) + result;
+}
 export interface TxInput {
   txid: Uint8Array;
   vout: number;
@@ -137,7 +161,7 @@ export function serializeTransaction(tx: Transaction): Uint8Array {
   );
 }
 /** 仅计算规范交易摘要；不产生签名，也不代替完整前序输出核验。 */
-export async function p2pkhSighash(
+export async function forkIdAllSighash(
   tx: Transaction,
   inputIndex: number,
   prev: TxOutput,
@@ -146,7 +170,8 @@ export async function p2pkhSighash(
     !Number.isInteger(inputIndex) ||
     inputIndex < 0 ||
     inputIndex >= tx.inputs.length ||
-    !p2pkh(prev.script)
+    prev.script.length === 0 ||
+    prev.script.length > 1024
   )
     fail("invalid-prevout");
   money(prev.satoshis);
@@ -174,6 +199,14 @@ export async function p2pkhSighash(
       le32(0x41),
     ),
   );
+}
+export async function p2pkhSighash(
+  tx: Transaction,
+  inputIndex: number,
+  prev: TxOutput,
+): Promise<Uint8Array> {
+  if (!p2pkh(prev.script)) fail("invalid-prevout");
+  return forkIdAllSighash(tx, inputIndex, prev);
 }
 export async function inspectP2pkh(
   raw: Uint8Array,
@@ -298,21 +331,94 @@ export class DeviceIdentityKey {
       ),
     );
   }
+  /** 费用池签名仍从完整交易证据计算，绝不开放任意摘要签名接口。 */
+  async signAllFeePool(
+    raw: Uint8Array,
+    previous: Uint8Array[],
+    family: import("./feepool.js").FeePoolFamily,
+    stage: import("./feepool.js").FeePoolStage,
+    signal: AbortSignal,
+    beforeSign: () => Promise<void>,
+  ): Promise<Uint8Array[]> {
+    const { inspectFeePool } = await import("./feepool.js");
+    const review = await inspectFeePool(
+      raw.slice(),
+      previous.map((p) => p.slice()),
+      this.publicKey(),
+      family,
+      stage,
+    );
+    await beforeSign();
+    if (this.closed) fail("locked");
+    if (signal.aborted) fail("revoked");
+    return review.digests.map((digest) =>
+      concat(
+        secp256k1
+          .sign(digest, this.key, { prehash: false, lowS: true })
+          .toDERRawBytes(),
+        Uint8Array.of(0x41),
+      ),
+    );
+  }
   async provePossession(
     transcript: Uint8Array,
     sessionId: number,
     challenge: Uint8Array,
   ): Promise<Uint8Array> {
-    const digest = await possessionDigest(
-      transcript,
-      this.publicKey(),
-      sessionId,
-      challenge,
-    );
+    const digest = await possessionDigest(transcript,this.publicKey(),sessionId,challenge);
     if (this.closed) fail("locked");
-    return secp256k1
-      .sign(digest, this.key, { prehash: false, lowS: true })
-      .toDERRawBytes();
+    return secp256k1.sign(digest,this.key,{prehash:false,lowS:true}).toDERRawBytes();
+  }
+  async signConnectEnvelope(kind: import("./connect-envelope.js").ConnectEnvelopeKind, body: import("./cbor.js").Value,
+    signal: AbortSignal, authorize: (review: import("./connect-envelope.js").ConnectEnvelopeReview) => Promise<boolean>): Promise<Uint8Array> {
+    const {inspectConnectEnvelope} = await import("./connect-envelope.js");
+    const review = await inspectConnectEnvelope(kind,structuredClone(body),this.publicKey());
+    const digest=review.digest.slice();
+    if (!(await authorize(structuredClone(review)))) fail("denied");
+    if (this.closed) fail("locked");
+    if(signal.aborted) fail("revoked");
+    return secp256k1.sign(digest,this.key,{prehash:false,lowS:true}).toDERRawBytes();
+  }
+  async reviewChannel(kind:import('./channel.js').ChannelOperationKind,raw:Uint8Array):Promise<import('./channel.js').ChannelReview> {
+    const channel=await import('./channel.js'),pub=this.publicKey();
+    if(kind==='seal')return channel.inspectSignedChannel(raw,pub);
+    if(kind==='open') {
+      const opened=await channel.openChannelEnvelope(raw,pub,peer=>{this.publicKey();return secp256k1.getSharedSecret(this.key,peer,true).slice(1);});
+      try{this.publicKey();return opened.review;}finally{opened.message.fill(0);}
+    }
+    return channel.inspectChannel(kind,raw,pub);
+  }
+  async signChannel(kind:import('./channel.js').ChannelKind,raw:Uint8Array,signal:AbortSignal,
+    authorize:(review:import('./channel.js').ChannelReview)=>Promise<boolean>):Promise<Uint8Array> {
+    const frozen=new Uint8Array(raw),review=await this.reviewChannel(kind,frozen),digest=review.digest.slice();
+    if(!(await authorize(structuredClone(review))))fail('denied');this.publicKey();if(signal.aborted)fail('revoked');
+    return secp256k1.sign(digest,this.key,{prehash:false,lowS:true}).toDERRawBytes();
+  }
+  async sealChannel(raw:Uint8Array,signal:AbortSignal,authorize:(review:import('./channel.js').ChannelReview)=>Promise<boolean>):Promise<Uint8Array> {
+    const channel=await import('./channel.js'),frozen=new Uint8Array(raw),pub=this.publicKey();
+    if(!(await authorize(await channel.inspectSignedChannel(frozen,pub))))fail('denied');this.publicKey();if(signal.aborted)fail('revoked');
+    const result=await channel.sealChannelSigned(frozen,pub,peer=>{this.publicKey();return secp256k1.getSharedSecret(this.key,peer,true).slice(1);});
+    if(this.closed||signal.aborted){result.fill(0);fail('revoked');}return result;
+  }
+  async openChannel(raw:Uint8Array,signal:AbortSignal,authorize:(review:import('./channel.js').ChannelReview)=>Promise<boolean>):Promise<Uint8Array> {
+    const channel=await import('./channel.js'),pub=this.publicKey();
+    const result=await channel.openChannelEnvelope(new Uint8Array(raw),pub,peer=>{this.publicKey();return secp256k1.getSharedSecret(this.key,peer,true).slice(1);});
+    try{if(!(await authorize(structuredClone(result.review))))fail('denied');this.publicKey();if(signal.aborted)fail('revoked');return result.message;}
+    catch(error){result.message.fill(0);throw error;}
+  }
+  async signNetworkIdentity(kind:import('./network-identity.js').NetworkIdentityKind,body:Value,signal:AbortSignal,
+    authorize:(review:import('./network-identity.js').NetworkIdentityReview)=>Promise<boolean>):Promise<Uint8Array> {
+    const {inspectNetworkIdentity}=await import('./network-identity.js');
+    const review=await inspectNetworkIdentity(kind,structuredClone(body),this.publicKey()),digest=review.digest.slice();
+    if(!(await authorize(structuredClone(review))))fail('denied');this.publicKey();if(signal.aborted)fail('revoked');
+    return secp256k1.sign(digest,this.key,{prehash:false,lowS:true}).toDERRawBytes();
+  }
+  async signBitfsWire(body:Value,signal:AbortSignal,authorize:(review:import('./bitfs-wire.js').BitfsWireReview)=>Promise<boolean>):Promise<Uint8Array> {
+    const frozen=decode(encode(body,32768),32768),{inspectBitfsWire}=await import('./bitfs-wire.js');
+    const review=await inspectBitfsWire(frozen,this.publicKey()),digest=review.digest.slice();
+    if(review.kind===5)fail('payment-context-required');
+    if(!(await authorize(structuredClone(review))))fail('denied');this.publicKey();if(signal.aborted)fail('revoked');
+    return secp256k1.sign(digest,this.key,{prehash:false,lowS:true}).toDERRawBytes();
   }
   close(): void {
     this.closed = true;

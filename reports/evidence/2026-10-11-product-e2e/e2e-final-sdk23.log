@@ -1,0 +1,390 @@
+
+> @vaultlink/sdk@0.2.0-draft.1 test
+> npm run build && node --test test/*.test.mjs
+
+
+> @vaultlink/sdk@0.2.0-draft.1 build
+> tsc -p tsconfig.json
+
+TAP version 13
+# Subtest: BitFS exact authentication document uses the existing wire domain and physical decision
+ok 1 - BitFS exact authentication document uses the existing wire domain and physical decision
+  ---
+  duration_ms: 80.233958
+  type: 'test'
+  ...
+# Subtest: BitFS authorization is fixed-schema and rejects duplicate hashes, zero IDs and transaction signature kinds
+ok 2 - BitFS authorization is fixed-schema and rejects duplicate hashes, zero IDs and transaction signature kinds
+  ---
+  duration_ms: 16.915
+  type: 'test'
+  ...
+# Subtest: output display derives Base58Check from the actual script for mainnet and testnet
+ok 3 - output display derives Base58Check from the actual script for mainnet and testnet
+  ---
+  duration_ms: 63.2525
+  type: 'test'
+  ...
+# Subtest: P2PKH validates real previous transaction/outpoint, ownership, fee, output-only amount
+ok 4 - P2PKH validates real previous transaction/outpoint, ownership, fee, output-only amount
+  ---
+  duration_ms: 19.71725
+  type: 'test'
+  ...
+# Subtest: altered previous evidence, wrong key, unknown script and denied authorization never sign
+ok 5 - altered previous evidence, wrong key, unknown script and denied authorization never sign
+  ---
+  duration_ms: 12.494542
+  type: 'test'
+  ...
+# Subtest: sequence, recipient, amount and locktime changes all alter actual signing digest
+ok 6 - sequence, recipient, amount and locktime changes all alter actual signing digest
+  ---
+  duration_ms: 11.20475
+  type: 'test'
+  ...
+# Subtest: real C++ canonical encoder handles a 32KiB map within 40KiB extra heap
+ok 7 - real C++ canonical encoder handles a 32KiB map within 40KiB extra heap
+  ---
+  duration_ms: 2940.310375
+  type: 'test'
+  ...
+# Subtest: Channel full semantic signer and authenticated inbox round trip use actual identity keys
+ok 8 - Channel full semantic signer and authenticated inbox round trip use actual identity keys
+  ---
+  duration_ms: 118.070208
+  type: 'test'
+  ...
+# Subtest: Channel rejects changed signature, recipient, ciphertext and unregistered protocol
+ok 9 - Channel rejects changed signature, recipient, ciphertext and unregistered protocol
+  ---
+  duration_ms: 44.286209
+  type: 'test'
+  ...
+# Subtest: Channel denial, cancellation and key lock prevent releasing signatures or plaintext
+ok 10 - Channel denial, cancellation and key lock prevent releasing signatures or plaintext
+  ---
+  duration_ms: 73.370541
+  type: 'test'
+  ...
+# Subtest: WebCrypto hashes only the actual Node Buffer view
+ok 11 - WebCrypto hashes only the actual Node Buffer view
+  ---
+  duration_ms: 7.313292
+  type: 'test'
+  ...
+# Subtest: Connect identity: exact envelope, own subject, low-S compact interoperability
+ok 12 - Connect identity: exact envelope, own subject, low-S compact interoperability
+  ---
+  duration_ms: 19.364875
+  type: 'test'
+  ...
+# Subtest: Connect intent requires exact complete content and cancellation prevents signing
+ok 13 - Connect intent requires exact complete content and cancellation prevents signing
+  ---
+  duration_ms: 6.265
+  type: 'test'
+  ...
+# Subtest: Connect rejects wrong identity, unordered or duplicate claims, trailing bytes and digest substitution
+ok 14 - Connect rejects wrong identity, unordered or duplicate claims, trailing bytes and digest substitution
+  ---
+  duration_ms: 3.916625
+  type: 'test'
+  ...
+# Subtest: CBOR executes legacy independent integer vectors and strict negatives
+ok 15 - CBOR executes legacy independent integer vectors and strict negatives
+  ---
+  duration_ms: 12.767083
+  type: 'test'
+  ...
+# Subtest: v2 byte stream handles splits, noise, coalescing, exact capacity and bad CRC
+ok 16 - v2 byte stream handles splits, noise, coalescing, exact capacity and bad CRC
+  ---
+  duration_ms: 556.581834
+  type: 'test'
+  ...
+# Subtest: RFC5869 HKDF is executed through WebCrypto
+ok 17 - RFC5869 HKDF is executed through WebCrypto
+  ---
+  duration_ms: 6.881708
+  type: 'test'
+  ...
+# Subtest: real X25519 and direction encryption bind entire handshake and close after tamper
+ok 18 - real X25519 and direction encryption bind entire handshake and close after tamper
+  ---
+  duration_ms: 16.014583
+  type: 'test'
+  ...
+# Subtest: record concurrent calls serialize nonce; gaps/replay and context replacement terminate
+ok 19 - record concurrent calls serialize nonce; gaps/replay and context replacement terminate
+  ---
+  duration_ms: 5.355833
+  type: 'test'
+  ...
+# Subtest: single slot/high watermark: controls accessible, old result eviction never reexecutes
+ok 20 - single slot/high watermark: controls accessible, old result eviction never reexecutes
+  ---
+  duration_ms: 0.952083
+  type: 'test'
+  ...
+# Subtest: commitment recomputes actual canonical object, alteration fails
+ok 21 - commitment recomputes actual canonical object, alteration fails
+  ---
+  duration_ms: 2.820167
+  type: 'test'
+  ...
+# Subtest: HELLO capability/connection tamper changes full transcript; wrong expected Key never pairs
+ok 22 - HELLO capability/connection tamper changes full transcript; wrong expected Key never pairs
+  ---
+  duration_ms: 6.643708
+  type: 'test'
+  ...
+# Subtest: fragmented results retain bounded query bytes; one-time material keeps only completion and replay fences
+ok 23 - fragmented results retain bounded query bytes; one-time material keeps only completion and replay fences
+  ---
+  duration_ms: 1.125209
+  type: 'test'
+  ...
+# Subtest: portable C++ core compiles with warnings as errors and consumes TypeScript wire bytes
+ok 24 - portable C++ core compiles with warnings as errors and consumes TypeScript wire bytes
+  ---
+  duration_ms: 2908.312958
+  type: 'test'
+  ...
+# Subtest: real atomic file persistence with P2PKH output-based policy: auto then cumulative confirm
+ok 25 - real atomic file persistence with P2PKH output-based policy: auto then cumulative confirm
+  ---
+  duration_ms: 202.155209
+  type: 'test'
+  ...
+# Subtest: real persistence failure does not silently grant policy access
+ok 26 - real persistence failure does not silently grant policy access
+  ---
+  duration_ms: 12.910083
+  type: 'test'
+  ...
+# Subtest: config revoked between reservation and signing is rejected and known-unexecuted quota released
+ok 27 - config revoked between reservation and signing is rejected and known-unexecuted quota released
+  ---
+  duration_ms: 74.837875
+  type: 'test'
+  ...
+# Subtest: connect: actual script roles, funding evidence, cumulative outputs, all-ForkID signatures and altered evidence rejection
+ok 28 - connect: actual script roles, funding evidence, cumulative outputs, all-ForkID signatures and altered evidence rejection
+  ---
+  duration_ms: 55.759792
+  type: 'test'
+  ...
+# Subtest: bitfs: actual script roles, funding evidence, cumulative outputs, all-ForkID signatures and altered evidence rejection
+ok 29 - bitfs: actual script roles, funding evidence, cumulative outputs, all-ForkID signatures and altered evidence rejection
+  ---
+  duration_ms: 39.30425
+  type: 'test'
+  ...
+# Subtest: actual disk pool ledger counts deltas across channels/restart, closes at zero, rejects concurrent/stale/rollback and restores proven-unexecuted reservation
+ok 30 - actual disk pool ledger counts deltas across channels/restart, closes at zero, rejects concurrent/stale/rollback and restores proven-unexecuted reservation
+  ---
+  duration_ms: 81.613
+  type: 'test'
+  ...
+# Subtest: bounded authenticated-message fragments retain all bytes; reordered, changed and oversized objects fail
+ok 31 - bounded authenticated-message fragments retain all bytes; reordered, changed and oversized objects fail
+  ---
+  duration_ms: 20.117292
+  type: 'test'
+  ...
+# Subtest: C++ JCS matches actual ECMAScript numbers, UTF16 ordering, escapes and bounded rejection
+ok 32 - C++ JCS matches actual ECMAScript numbers, UTF16 ordering, escapes and bounded rejection
+  ---
+  duration_ms: 4777.126542
+  type: 'test'
+  ...
+# Subtest: local-secret wire boundary preserves the v3 envelope and rejects malformed scopes and oversized material
+ok 33 - local-secret wire boundary preserves the v3 envelope and rejects malformed scopes and oversized material
+  ---
+  duration_ms: 4.393167
+  type: 'test'
+  ...
+# Subtest: public device migration record has exact CBOR fields and clones commitments
+ok 34 - public device migration record has exact CBOR fields and clones commitments
+  ---
+  duration_ms: 6.107375
+  type: 'test'
+  ...
+# Subtest: actual C++ durable journal preserves host commitment through erase stages and rejects skipped/changed/replayed stages
+ok 35 - actual C++ durable journal preserves host commitment through erase stages and rejects skipped/changed/replayed stages
+  ---
+  duration_ms: 3545.739708
+  type: 'test'
+  ...
+# Subtest: import proof authenticates actual source key, binds fresh challenge and rejects a provisional transport key
+ok 36 - import proof authenticates actual source key, binds fresh challenge and rejects a provisional transport key
+  ---
+  duration_ms: 74.649459
+  type: 'test'
+  ...
+# Subtest: native device policy: plugin single limit and App cross-channel cumulative limit survive persistence
+ok 37 - native device policy: plugin single limit and App cross-channel cumulative limit survive persistence
+  ---
+  duration_ms: 3870.252917
+  type: 'test'
+  ...
+# Subtest: restricted network identity matches independently captured libp2p payload and cannot sign a supplied digest
+ok 38 - restricted network identity matches independently captured libp2p payload and cannot sign a supplied digest
+  ---
+  duration_ms: 95.805167
+  type: 'test'
+  ...
+# Subtest: terminal payments archive on real disk without resetting session used, forgetting unknown results or permitting replay
+ok 39 - terminal payments archive on real disk without resetting session used, forgetting unknown results or permitting replay
+  ---
+  duration_ms: 7098.275791
+  type: 'test'
+  ...
+# Subtest: closed-session receipts preserve later activity across migration and prohibit reconnecting retired session ids
+ok 40 - closed-session receipts preserve later activity across migration and prohibit reconnecting retired session ids
+  ---
+  duration_ms: 4694.3845
+  type: 'test'
+  ...
+# Subtest: pool cumulative paid survives terminal compaction and finite replay archive exhaustion refuses new execution
+ok 41 - pool cumulative paid survives terminal compaction and finite replay archive exhaustion refuses new execution
+  ---
+  duration_ms: 34955.060917
+  type: 'test'
+  ...
+# Subtest: registration, ownership, config revision and first-enable confirmation
+ok 42 - registration, ownership, config revision and first-enable confirmation
+  ---
+  duration_ms: 7.034959
+  type: 'test'
+  ...
+# Subtest: equal single/session thresholds auto; either excess requires single bound approval
+ok 43 - equal single/session thresholds auto; either excess requires single bound approval
+  ---
+  duration_ms: 9.292125
+  type: 'test'
+  ...
+# Subtest: raise applies only current session and never clears used/default/single threshold
+ok 44 - raise applies only current session and never clears used/default/single threshold
+  ---
+  duration_ms: 3.681292
+  type: 'test'
+  ...
+# Subtest: cross-channel atomic reservations prevent concurrent small payments evading session total
+ok 45 - cross-channel atomic reservations prevent concurrent small payments evading session total
+  ---
+  duration_ms: 2.130125
+  type: 'test'
+  ...
+# Subtest: signed/unknown retain budget, known-unexecuted release leaves replay tombstone
+ok 46 - signed/unknown retain budget, known-unexecuted release leaves replay tombstone
+  ---
+  duration_ms: 4.979459
+  type: 'test'
+  ...
+# Subtest: restart retains App budget and explicit close prevents revival
+ok 47 - restart retains App budget and explicit close prevents revival
+  ---
+  duration_ms: 3.786917
+  type: 'test'
+  ...
+# Subtest: storage failure fail-closes, requests and mutable approval cannot bypass binding
+ok 48 - storage failure fail-closes, requests and mutable approval cannot bypass binding
+  ---
+  duration_ms: 1.377416
+  type: 'test'
+  ...
+# Subtest: plugins have no session cumulative budget and money is BigInt; output-only ignores change
+ok 49 - plugins have no session cumulative budget and money is BigInt; output-only ignores change
+  ---
+  duration_ms: 2.586166
+  type: 'test'
+  ...
+# Subtest: owner default session limit changes atomically across App channels without changing the active session
+ok 50 - owner default session limit changes atomically across App channels without changing the active session
+  ---
+  duration_ms: 2.918583
+  type: 'test'
+  ...
+# Subtest: version 1 policy upgrades without losing channel configuration or previously signed session usage
+ok 51 - version 1 policy upgrades without losing channel configuration or previously signed session usage
+  ---
+  duration_ms: 6.189667
+  type: 'test'
+  ...
+# Subtest: software disk ledger migrates through actual C++ Policy with closed budget, uint64, unknown payments and pool baselines intact
+ok 52 - software disk ledger migrates through actual C++ Policy with closed budget, uint64, unknown payments and pool baselines intact
+  ---
+  duration_ms: 3381.642583
+  type: 'test'
+  ...
+# Subtest: unpowered-device restart: same identity/config, locked old key, retained App budget, no payment replay
+ok 53 - unpowered-device restart: same identity/config, locked old key, retained App budget, no payment replay
+  ---
+  duration_ms: 158.942166
+  type: 'test'
+  ...
+# Subtest: independent Python v2 transcript, directional derivation and BIP143 vectors
+ok 54 - independent Python v2 transcript, directional derivation and BIP143 vectors
+  ---
+  duration_ms: 17.085125
+  type: 'test'
+  ...
+# Subtest: full physical-pairing callbacks, possession proof, encrypted request and response roundtrip
+ok 55 - full physical-pairing callbacks, possession proof, encrypted request and response roundtrip
+  ---
+  duration_ms: 118.068208
+  type: 'test'
+  ...
+# Subtest: pairing refusal does not grant a usable session
+ok 56 - pairing refusal does not grant a usable session
+  ---
+  duration_ms: 9.489459
+  type: 'test'
+  ...
+# Subtest: control query/cancel stays reachable while real authorization is awaiting, no execution
+ok 57 - control query/cancel stays reachable while real authorization is awaiting, no execution
+  ---
+  duration_ms: 34.76525
+  type: 'test'
+  ...
+# Subtest: concurrent large requests keep authenticated fragments contiguous and preserve the business slot
+ok 58 - concurrent large requests keep authenticated fragments contiguous and preserve the business slot
+  ---
+  duration_ms: 82.660083
+  type: 'test'
+  ...
+# Subtest: first binding publishes only the device Key authenticated by both pairing and possession proof
+ok 59 - first binding publishes only the device Key authenticated by both pairing and possession proof
+  ---
+  duration_ms: 19.991666
+  type: 'test'
+  ...
+# Subtest: real encrypted byte streams deliver fragmented results and retain no one-time result bytes
+ok 60 - real encrypted byte streams deliver fragmented results and retain no one-time result bytes
+  ---
+  duration_ms: 91.874833
+  type: 'test'
+  ...
+# Subtest: closing an encrypted session during a one-time operation wipes a late private result and publishes none
+ok 61 - closing an encrypted session during a one-time operation wipes a late private result and publishes none
+  ---
+  duration_ms: 19.097875
+  type: 'test'
+  ...
+# Subtest: standard single-key script interpretation binds complete prevouts, excludes own outputs, and rejects arbitrary input scripts
+ok 62 - standard single-key script interpretation binds complete prevouts, excludes own outputs, and rejects arbitrary input scripts
+  ---
+  duration_ms: 70.7025
+  type: 'test'
+  ...
+1..62
+# tests 62
+# suites 0
+# pass 62
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 47781.83825

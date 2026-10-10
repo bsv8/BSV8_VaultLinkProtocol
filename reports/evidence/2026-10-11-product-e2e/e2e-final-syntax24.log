@@ -1,0 +1,32 @@
+mbedTLS 头文件: /opt/homebrew/opt/mbedtls@3/include（crypto 也纳入语法检查）
+  ok   src/board/board.cpp
+  ok   src/board/buttons.cpp
+  ok   src/board/display.cpp
+  ok   src/core/app.cpp
+  ok   src/core/log.cpp
+  ok   src/crypto/aead.cpp
+  ok   src/crypto/digest.cpp
+  ok   src/crypto/ripemd160.cpp
+  ok   src/crypto/secp256k1.cpp
+  ok   src/crypto/secure.cpp
+  ok   src/crypto/x25519.cpp
+  ok   src/i18n/i18n.cpp
+  ok   src/main.cpp
+  ok   src/ops/dispatch.cpp
+  ok   src/ops/local_secret.cpp
+  ok   src/ops/review.cpp
+  ok   src/ops/tx.cpp
+  ok   src/policy/policy.cpp
+  ok   src/proto/cbor.cpp
+  ok   src/proto/frame.cpp
+  ok   src/proto/link.cpp
+  ok   src/store/crc32.cpp
+  ok   src/store/keystore.cpp
+  ok   src/store/vault_fs.cpp
+  ok   src/ui/font.cpp
+  ok   src/ui/text.cpp
+  ok   src/ui/widgets.cpp
+
+语法检查：27 个通过，0 个失败，0 个有警告
+未覆盖（缺 ESP-IDF 头文件）：
+  - src/crypto/rand.cpp

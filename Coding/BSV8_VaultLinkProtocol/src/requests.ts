@@ -1,4 +1,5 @@
 import { equal, fail, fixed, u32 } from "./bytes.js";
+import { MAX_MESSAGE } from "./fragments.js";
 export type RequestState =
   | "awaiting-user"
   | "executing"
@@ -60,11 +61,14 @@ export class RequestGate {
     if (r.state !== "awaiting-user") fail("invalid-state");
     r.state = "executing";
   }
-  complete(id: number, payload: Uint8Array): RequestResult {
+  complete(id: number, payload: Uint8Array, retainResult = true): RequestResult {
     const r = this.current(id);
-    if (r.state !== "executing" || payload.length > 896) fail("invalid-state");
+    if (r.state !== "executing" || payload.length > MAX_MESSAGE) fail("invalid-state");
     r.state = "completed";
-    r.payload = payload.slice();
+    // The application message can be fragmented. A query wraps its payload in
+    // another envelope, so reserve bounded space for that envelope. One-time
+    // secrets retain only completion state and replay protection, never bytes.
+    r.payload = retainResult && payload.length <= MAX_MESSAGE - 512 ? payload.slice() : null;
     return this.finish(r);
   }
   cancel(id: number, commitment: Uint8Array): RequestResult {

@@ -1,0 +1,45 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {mkdtemp,readFile,writeFile,rename,rm} from 'node:fs/promises';
+import {spawnSync} from 'node:child_process';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {PaymentPolicy,encodePaymentPolicy,decodePaymentPolicy,assertHardwarePaymentPolicy,assertPaymentPolicyContinuation,decode,encode} from '../dist/index.js';
+const key='0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798';
+test('software disk ledger migrates through actual C++ Policy with closed budget, uint64, unknown payments and pool baselines intact',async()=>{
+ const dir=await mkdtemp(join(tmpdir(),'vlp-policy-transfer-')),json=join(dir,'soft.json'),bank=join(dir,'bank'),exe=join(dir,'policy');
+ const stringify=s=>JSON.stringify(s,(_k,v)=>typeof v==='bigint'?{$bigint:String(v)}:v instanceof Uint8Array?{$bytes:[...v]}:v);
+ const parse=s=>JSON.parse(s,(_k,v)=>v?.$bigint!==undefined?BigInt(v.$bigint):v?.$bytes?Uint8Array.from(v.$bytes):v);
+ const store={async load(){try{return parse(await readFile(json,'utf8'));}catch(e){if(e.code==='ENOENT')return null;throw e;}},async save(s){await writeFile(json+'.tmp',stringify(s));await rename(json+'.tmp',json);}};
+ try{
+  const policy=await PaymentPolicy.open(store,key),maximum=0xffffffffffffffffn;
+  await policy.configure({id:'app.main',owner:'app-owner',kind:'app',network:'main',paymentType:'p2pkh',enabled:true,singleLimit:maximum,defaultSessionLimit:maximum,revision:1},true);
+  await policy.startSession('connection','app-owner',true);
+  const request={requestId:'actual-spend',channelId:'app.main',owner:'app-owner',kind:'app',sessionId:'connection',network:'main',paymentType:'p2pkh',amount:10n,commitment:new Uint8Array(32).fill(1)};
+  await policy.reserve(request);await policy.markSigned(request.requestId);await policy.closeSession('connection');
+  await policy.configure({id:'pool',owner:'msfile',kind:'plugin',network:'main',paymentType:'feepool.bitfs',enabled:true,singleLimit:maximum,defaultSessionLimit:0n,revision:1},true);
+  const delta=await policy.inspectPool('fund:0',new Uint8Array(32).fill(2),25n);
+  await policy.reserve({...request,requestId:'unknown-spend',channelId:'pool',owner:'msfile',kind:'plugin',sessionId:null,paymentType:'feepool.bitfs',amount:25n,pool:delta.pool});
+  const snapshot=await policy.snapshot();assertHardwarePaymentPolicy(snapshot,key);await writeFile(bank,encodePaymentPolicy(snapshot,key));
+  const source=fileURLToPath(new URL('../device/policy_transfer_test.cpp',import.meta.url));
+  const compiled=spawnSync('c++',['-std=c++17','-Wall','-Wextra','-Werror','-fsanitize=address,undefined',source,'-o',exe],{encoding:'utf8'});assert.equal(compiled.status,0,compiled.stderr);
+  const cpp=spawnSync(exe,[bank,key],{encoding:'utf8'});assert.equal(cpp.status,0,cpp.stderr);
+  const received=decodePaymentPolicy(new Uint8Array(await readFile(bank)),key);assert.equal(received.sessions[0].used,10n);assert.equal(received.sessions[0].active,false);assert.equal(received.channels[0].singleLimit,maximum);assert.equal(received.pending.find(p=>p.id==='unknown-spend').state,'unknown');assert.equal(received.pools[0].paid,25n);
+  await store.save(received);const restored=await PaymentPolicy.open(store,key);assert.deepEqual(await restored.snapshot(),received);await assert.rejects(restored.startSession('connection','app-owner',true),/session-reuse/);
+  assertPaymentPolicyContinuation(received,await restored.snapshot(),key);
+  await restored.configure({...received.channels[0],singleLimit:maximum-1n,defaultSessionLimit:maximum-1n,revision:received.channels[0].revision+1},true);
+  await restored.startSession('next-connection','app-owner',true);
+  await restored.reserve({...request,requestId:'later-spend',sessionId:'next-connection',amount:35n,commitment:new Uint8Array(32).fill(3)});
+  await restored.markSigned('later-spend');
+  const later=await restored.snapshot();assertPaymentPolicyContinuation(received,later,key);
+  const reset={version:2,key,channels:later.channels,sessions:[],pending:[],pools:[]};
+  const validEmpty=decodePaymentPolicy(encodePaymentPolicy(reset,key),key);
+  assert.throws(()=>assertPaymentPolicyContinuation(received,validEmpty,key),/policy-rollback/);
+  const forgotten={...later,sessions:later.sessions.filter(s=>s.id!=='connection'),pending:later.pending.filter(p=>p.sessionId!=='connection')};
+  PaymentPolicy.inspectSnapshot(forgotten,key);
+  assert.throws(()=>assertPaymentPolicyContinuation(received,forgotten,key),/policy-rollback/);
+  const corrupt=decode(new Uint8Array(await readFile(bank)),65536);corrupt.sessions[0].used=0;assert.throws(()=>decodePaymentPolicy(encode(corrupt,65536),key),/corrupt-state/);await writeFile(bank,encode(corrupt,65536));assert.equal(spawnSync(exe,[bank,key],{encoding:'utf8'}).status,1);
+  assert.throws(()=>assertHardwarePaymentPolicy({...received,channels:received.channels.map(c=>({...c,network:'test'}))},key),/unsupported-policy/);
+ }finally{await rm(dir,{recursive:true,force:true});}
+});

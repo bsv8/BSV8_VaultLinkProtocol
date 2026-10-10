@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  connectHost,
+  connectHost, enrollHost,
   acceptDevice,
   DeviceIdentityKey,
   secpIdentityVerifier,
@@ -163,4 +163,91 @@ test("control query/cancel stays reachable while real authorization is awaiting,
   assert.equal(executed, 0);
   await client.close();
   await Promise.all(loops);
+});
+test("concurrent large requests keep authenticated fragments contiguous and preserve the business slot", async () => {
+  const [h,d]=wire(), key=new DeviceIdentityKey(priv);
+  const ready=acceptDevice(d,key,51,52,async()=>true);
+  const client=await connectHost(h,{walletGeneration:1,backendGeneration:1,hostRunGeneration:1},key.publicKey(),secpIdentityVerifier,async()=>true);
+  const server=new DeviceServer(await ready,()=>key.close());
+  server.register("identity.large",{profile:"identity",version:1,
+    async verify(body){object(body,["id","raw"]);assert.equal(body.raw.length,12000);assert.ok(body.raw.every(b=>b===body.id));return body;},
+    async authorize(){return true;},async execute(core){return {id:core.id};}});
+  const loops=[server.run(),client.run()];
+  try{
+    const bodies=[1,2,3].map(id=>({id,raw:new Uint8Array(12000).fill(id)}));
+    const hashes=await Promise.all(bodies.map(body=>commitment("identity",1,body)));
+    const results=await Promise.all(bodies.map((body,i)=>client.execute("identity.large",body,hashes[i])));
+    for(let i=0;i<results.length;i++)assert.ok(results[i].id===bodies[i].id || results[i].error==="busy");
+    const pong=await client.execute("system.ping",{},await commitment("system",1,{op:"system.ping"}));
+    assert.equal(pong.error,undefined);
+  }finally{await client.close();await Promise.all(loops);}
+});
+
+test("first binding publishes only the device Key authenticated by both pairing and possession proof", async () => {
+  const [host, device] = wire(), key = new DeviceIdentityKey(priv);
+  let hostCode, deviceCode;
+  const ready = acceptDevice(device, key, 1, 2, async code => {deviceCode = code; return true;});
+  const verified = await enrollHost(host, {walletGeneration: 3, backendGeneration: 4, hostRunGeneration: 5},
+    secpIdentityVerifier, async code => {hostCode = code; return true;});
+  const session = await ready;
+  assert.equal(hostCode, deviceCode);
+  assert.deepEqual(verified.publicKey, key.publicKey());
+  const server = new DeviceServer(session, () => key.close());
+  const loops = [server.run(), verified.client.run()];
+  await verified.client.close(); await Promise.all(loops);
+});
+
+test("real encrypted byte streams deliver fragmented results and retain no one-time result bytes", async () => {
+  const [host, device] = wire(), key = new DeviceIdentityKey(priv);
+  const ready = acceptDevice(device, key, 61, 62, async () => true);
+  const client = await connectHost(host, { walletGeneration: 1, backendGeneration: 1, hostRunGeneration: 1 }, key.publicKey(), secpIdentityVerifier, async () => true);
+  const server = new DeviceServer(await ready, () => key.close());
+  const { sha256, decode } = await import("../dist/index.js");
+  let oneTime;
+  // This exercises the actual SDK message layer, not a wallet operation or
+  // physical approval. The returned digest is computed from the received bytes.
+  for (const [operation, retainResult] of [["bytes.roundtrip", true], ["bytes.one-time", false]]) {
+    server.register(operation, { profile: "byte-stream-test", version: 1, retainResult,
+      async verify(body) { object(body, ["raw"]); assert.equal(body.raw.length, 8192); return body; },
+      async authorize() { return true; },
+      async execute(core) {
+        const digest = await sha256(core.raw);
+        if (!retainResult) { oneTime = digest; return { digest }; }
+        return { raw: core.raw.slice(), digest };
+      },
+    });
+  }
+  const loops = [server.run(), client.run()], body = { raw: crypto.getRandomValues(new Uint8Array(8192)) };
+  const hash = await commitment("byte-stream-test", 1, body), expected = await sha256(body.raw);
+  try {
+    const roundtrip = client.submit("bytes.roundtrip", body, hash);
+    const result = await roundtrip.result;
+    assert.deepEqual(result.raw, body.raw); assert.deepEqual(result.digest, expected);
+    const query = { requestId: roundtrip.requestId, commitment: hash };
+    const status = await client.execute("system.query", query, await commitment("system", 1, query));
+    assert.equal(status.state, "completed"); assert.deepEqual(decode(status.payload, 32768).raw, body.raw);
+    const secret = client.submit("bytes.one-time", body, hash);
+    assert.deepEqual((await secret.result).digest, expected);
+    const reference = { requestId: secret.requestId, commitment: hash };
+    const final = await client.execute("system.query", reference, await commitment("system", 1, reference));
+    assert.equal(final.state, "completed"); assert.equal(final.payload, null);
+    assert.ok(oneTime.every(byte => byte === 0));
+  } finally { await client.close(); await Promise.all(loops); }
+});
+
+test("closing an encrypted session during a one-time operation wipes a late private result and publishes none",async()=>{
+ const [host,device]=wire(),key=new DeviceIdentityKey(priv);
+ const ready=acceptDevice(device,key,71,72,async()=>true);
+ const client=await connectHost(host,{walletGeneration:1,backendGeneration:1,hostRunGeneration:1},key.publicKey(),secpIdentityVerifier,async()=>true);
+ const server=new DeviceServer(await ready,()=>key.close());
+ let entered,release;const started=new Promise(r=>entered=r),wait=new Promise(r=>release=r);
+ const secret=crypto.getRandomValues(new Uint8Array(32));
+ server.register('bytes.one-time',{profile:'one-time-close',version:1,retainResult:false,
+  async verify(body){object(body,[]);return body;},async authorize(){return true;},
+  async execute(){entered();await wait;return {privateKey:secret};}});
+ const loops=[server.run(),client.run()];
+ const result=client.execute('bytes.one-time',{},await commitment('one-time-close',1,{}));
+ const rejected=assert.rejects(result);await started;
+ try{await server.close();release();await rejected;await new Promise(setImmediate);assert.ok(secret.every(b=>b===0));}
+ finally{release();await client.close();await Promise.all(loops);}
 });

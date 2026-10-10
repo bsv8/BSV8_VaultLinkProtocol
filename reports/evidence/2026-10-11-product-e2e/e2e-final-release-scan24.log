@@ -1,0 +1,9 @@
+[release-scan] env=m5stack-core-en buildId=? elf=21240704 bytes
+  ok   已扫描 ELF 符号（7945 个），无测试按键 / 无通用盲签 / 无旧原始密钥入口（迁移导出另需 PIN 与实体确认）
+  ok   未发现秘密字符串
+[release-scan] env=m5stack-core-e2e-en buildId=? elf=21421112 bytes
+  FAIL 符号 DevInjectTestKey 出现在发布固件中
+  FAIL 符号 DevButtonApi 出现在发布固件中
+  FAIL 符号 DevTestControl 出现在发布固件中
+  FAIL 符号 rockey::e2e:: 出现在发布固件中
+PASS: latest release accepted, test firmware rejected

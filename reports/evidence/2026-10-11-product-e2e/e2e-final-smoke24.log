@@ -1,0 +1,14 @@
+
+> @vaultlink/sdk@0.2.0-draft.1 integration:rockey:smoke
+> playwright test -c integration/rockey/playwright.config.mjs smoke.spec.mjs
+
+[WebServer] (node:45734) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:45737) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 integration/rockey/smoke.spec.mjs:2:1 › product E2E browser page and actual Keymaster Worker start without hardware (12.3s)
+
+  1 passed (13.5s)

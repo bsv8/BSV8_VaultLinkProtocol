@@ -20,7 +20,12 @@
     "integration:firmware": "node integration/runner/firmware.mjs",
     "integration:prepare": "node integration/runner/bootstrap.mjs",
     "integration:flash-test": "node integration/runner/hardware.mjs --flash",
-    "integration:vendor": "node integration/runner/verify-vendor.mjs"
+    "integration:vendor": "node integration/runner/verify-vendor.mjs",
+    "integration:rockey:prepare": "node integration/rockey/run.mjs --prepare",
+    "integration:rockey:smoke": "playwright test -c integration/rockey/playwright.config.mjs smoke.spec.mjs",
+    "integration:rockey:list": "node integration/rockey/run.mjs --list",
+    "integration:rockey": "node integration/rockey/run.mjs",
+    "integration:rockey:flash": "node integration/rockey/run.mjs --flash"
   },
   "devDependencies": {
     "@playwright/test": "1.64.0",
@@ -29,6 +34,7 @@
     "typescript": "5.9.3"
   },
   "dependencies": {
-    "@noble/curves": "1.9.7"
+    "@noble/curves": "1.9.7",
+    "@noble/hashes": "1.8.0"
   }
 }

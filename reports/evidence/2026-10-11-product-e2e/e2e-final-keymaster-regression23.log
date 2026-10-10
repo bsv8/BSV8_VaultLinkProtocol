@@ -1,0 +1,38 @@
+
+ RUN  v3.2.4 /Users/david/Workspaces/keymaster.cc
+
+ ✓ |jsdom| Coding/keymaster/vaultlink-integration/test/payment-ui.test.tsx (1 test) 1546ms
+   ✓ over-limit dialog displays actual amounts/address and never silently resets session or future defaults  1545ms
+ ✓ |node| Coding/keymaster/vaultlink-integration/test/hardware-key-record.test.ts (9 tests) 1466ms
+   ✓ 硬件公开 Key 记录：生产仓储与 Coordinator 冷启动 > 同 Key 条件替换后端保留其它记录、拒绝换身份/陈旧提交，迁回使用新软件密码  937ms
+stderr | Coding/keymaster/vaultlink-integration/test/hardware-coordinator.test.ts > 正式 Coordinator：attach、真实 C++ 配对、独立控制面、错页面拒绝与全局锁撤销
+[sat-subscription] sat.runtime.unhealthy { error: 'Window P2P executor is unavailable' }
+
+stderr | Coding/keymaster/vaultlink-integration/test/hardware-coordinator.test.ts > 正式 Coordinator：attach、真实 C++ 配对、独立控制面、错页面拒绝与全局锁撤销
+[sat-subscription] stale mux start failed Channel subscription mux became stale during startup
+
+stderr | Coding/keymaster/vaultlink-integration/test/hardware-coordinator.test.ts > 正式 Coordinator：attach、真实 C++ 配对、独立控制面、错页面拒绝与全局锁撤销
+[sat-subscription] sat.runtime.unhealthy { error: 'Window P2P executor is unavailable' }
+
+stderr | Coding/keymaster/vaultlink-integration/test/hardware-coordinator.test.ts > 正式 Coordinator：enroll、真实 C++ 配对、独立控制面、错页面拒绝与全局锁撤销
+[sat-subscription] sat.runtime.unhealthy { error: 'Window P2P executor is unavailable' }
+
+stderr | Coding/keymaster/vaultlink-integration/test/hardware-coordinator.test.ts > 正式 Coordinator：attach-close、真实 C++ 配对、独立控制面、错页面拒绝与全局锁撤销
+[sat-subscription] stale runtime start failed Storage file handle is stale
+
+stderr | Coding/keymaster/vaultlink-integration/test/hardware-coordinator.test.ts > 正式 Coordinator：attach-close、真实 C++ 配对、独立控制面、错页面拒绝与全局锁撤销
+[msfile] BitFS buyer recovery gate remains closed BitFS 买方会话恢复未完成，已阻止新购买：Storage file handle is stale
+
+stderr | Coding/keymaster/vaultlink-integration/test/hardware-coordinator.test.ts > 正式 Coordinator：attach-close、真实 C++ 配对、独立控制面、错页面拒绝与全局锁撤销
+[channel] owner runtime startup deferred Coordinator unit unavailable: sat-subscription.coordinator-worker (owner-session-unavailable)
+
+ ✓ |node| Coding/keymaster/vaultlink-integration/test/hardware-coordinator.test.ts (4 tests) 17866ms
+   ✓ 正式 Coordinator：attach、真实 C++ 配对、独立控制面、错页面拒绝与全局锁撤销  6122ms
+   ✓ 正式 Coordinator：enroll、真实 C++ 配对、独立控制面、错页面拒绝与全局锁撤销  6245ms
+   ✓ 正式 Coordinator：attach-close、真实 C++ 配对、独立控制面、错页面拒绝与全局锁撤销  5494ms
+
+ Test Files  3 passed (3)
+      Tests  14 passed (14)
+   Start at  00:43:11
+   Duration  23.41s (transform 3.53s, setup 272ms, collect 10.31s, tests 20.88s, environment 924ms, prepare 469ms)
+

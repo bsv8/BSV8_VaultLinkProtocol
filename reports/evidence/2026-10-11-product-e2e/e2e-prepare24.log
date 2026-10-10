@@ -1,0 +1,172 @@
+
+> @vaultlink/sdk@0.2.0-draft.1 integration:rockey:prepare
+> node integration/rockey/run.mjs --prepare
+
+TAP version 13
+# Subtest: JS ↔ actual RocKey C++ test frame: fragmentation, boot noise, CRC and maximum length
+ok 1 - JS ↔ actual RocKey C++ test frame: fragmentation, boot noise, CRC and maximum length
+  ---
+  duration_ms: 1236.391667
+  type: 'test'
+  ...
+# Subtest: actual button algorithm retains debounce, release gate, long press and injection expiry
+ok 2 - actual button algorithm retains debounce, release gate, long press and injection expiry
+  ---
+  duration_ms: 412.375167
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1719.18675
+Product E2E Window and real Keymaster Worker bundles compile.
+Processing m5stack-core-e2e-en (platform: espressif32@6.12.0; board: m5stack-core-esp32; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/m5stack-core-esp32.html
+PLATFORM: Espressif 32 (6.12.0) > M5Stack Core ESP32
+HARDWARE: ESP32 240MHz, 320KB RAM, 4MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20017.241212+sha.dcc1105b 
+ - tool-esptoolpy @ 2.40900.250804 (4.9.0) 
+ - toolchain-xtensa-esp32 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 34 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- TFT_eSPI @ 2.5.43
+|-- LittleFS @ 2.0.0
+Building in release mode
+Compiling .pio/build/m5stack-core-e2e-en/mbedtls-extra/hkdf.o
+Compiling .pio/build/m5stack-core-e2e-en/mbedtls-extra/ripemd160.o
+Compiling .pio/build/m5stack-core-e2e-en/vlp-json-number/bignum-dtoa.o
+Compiling .pio/build/m5stack-core-e2e-en/vlp-json-number/bignum.o
+Compiling .pio/build/m5stack-core-e2e-en/vlp-json-number/cached-powers.o
+Compiling .pio/build/m5stack-core-e2e-en/vlp-json-number/double-to-string.o
+Compiling .pio/build/m5stack-core-e2e-en/vlp-json-number/fast-dtoa.o
+Compiling .pio/build/m5stack-core-e2e-en/vlp-json-number/fixed-dtoa.o
+Compiling .pio/build/m5stack-core-e2e-en/vlp-json-number/string-to-double.o
+Compiling .pio/build/m5stack-core-e2e-en/vlp-json-number/strtod.o
+Compiling .pio/build/m5stack-core-e2e-en/uart-iram/uart.o
+Compiling .pio/build/m5stack-core-e2e-en/uart-iram/uart_hal_iram.o
+Compiling .pio/build/m5stack-core-e2e-en/src/board/board.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/board/buttons.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/board/display.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/core/app.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/core/log.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/crypto/aead.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/crypto/digest.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/crypto/rand.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/crypto/ripemd160.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/crypto/secp256k1.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/crypto/secure.cpp.o
+In file included from src/board/display.cpp:3:
+.pio/libdeps/m5stack-core-e2e-en/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+Compiling .pio/build/m5stack-core-e2e-en/src/crypto/x25519.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/i18n/i18n.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/main.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/ops/dispatch.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/ops/local_secret.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/ops/review.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/ops/tx.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/policy/policy.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/proto/cbor.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/proto/frame.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/proto/link.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/store/crc32.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/store/keystore.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/store/vault_fs.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/ui/font.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/ui/text.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/src/ui/widgets.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/libb83/SPI/SPI.cpp.o
+In file included from src/ui/font.cpp:3:
+.pio/libdeps/m5stack-core-e2e-en/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+Compiling .pio/build/m5stack-core-e2e-en/lib80a/FS/FS.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/lib80a/FS/vfs_api.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/lib1e4/SPIFFS/SPIFFS.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/libdd7/LittleFS/LittleFS.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/lib7f7/TFT_eSPI/TFT_eSPI.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/Esp.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/FirmwareMSC.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/FunctionalInterrupt.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/HWCDC.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/HardwareSerial.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/IPAddress.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/IPv6Address.cpp.o
+In file included from .pio/libdeps/m5stack-core-e2e-en/TFT_eSPI/TFT_eSPI.cpp:16:
+.pio/libdeps/m5stack-core-e2e-en/TFT_eSPI/TFT_eSPI.h:973:8: warning: #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available! [-Wcpp]
+       #warning >>>>------>> TOUCH_CS pin not defined, TFT_eSPI touch functions will not be available!
+        ^~~~~~~
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/MD5Builder.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/Print.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/Stream.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/StreamString.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/Tone.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/USB.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/USBCDC.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/USBMSC.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/WMath.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/WString.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/base64.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/cbuf.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/esp32-hal-adc.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/esp32-hal-bt.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/esp32-hal-cpu.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/esp32-hal-dac.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/esp32-hal-gpio.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/esp32-hal-i2c-slave.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/esp32-hal-i2c.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/esp32-hal-ledc.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/esp32-hal-matrix.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/esp32-hal-misc.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/esp32-hal-psram.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/esp32-hal-rgb-led.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/esp32-hal-rmt.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/esp32-hal-sigmadelta.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/esp32-hal-spi.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/esp32-hal-time.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/esp32-hal-timer.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/esp32-hal-tinyusb.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/esp32-hal-touch.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/esp32-hal-uart.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/firmware_msc_fat.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/libb64/cdecode.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/libb64/cencode.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/main.cpp.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/stdlib_noniso.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/wiring_pulse.c.o
+Compiling .pio/build/m5stack-core-e2e-en/FrameworkArduino/wiring_shift.c.o
+Archiving .pio/build/m5stack-core-e2e-en/libFrameworkArduino.a
+Indexing .pio/build/m5stack-core-e2e-en/libFrameworkArduino.a
+Linking .pio/build/m5stack-core-e2e-en/firmware.elf
+Retrieving maximum program size .pio/build/m5stack-core-e2e-en/firmware.elf
+Checking size .pio/build/m5stack-core-e2e-en/firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [===       ]  31.9% (used 104484 bytes from 327680 bytes)
+Flash: [======    ]  59.4% (used 1011305 bytes from 1703936 bytes)
+Building .pio/build/m5stack-core-e2e-en/firmware.bin with action:
+  "$PYTHONEXE" "$OBJCOPY" --chip esp32 elf2image --flash_mode ${__get_board_flash_mode(__env__)} --flash_freq ${__get_board_f_image(__env__)} --flash_size 4MB --elf-sha256-offset 0xb0 -o $TARGET $SOURCES
+Building .pio/build/m5stack-core-e2e-en/firmware.bin
+esptool.py v4.9.0
+Creating esp32 image...
+Merged 2 ELF sections
+Successfully created esp32 image.
+========================= [SUCCESS] Took 27.55 seconds =========================
+
+Environment          Status    Duration
+-------------------  --------  ------------
+m5stack-core-e2e-en  SUCCESS   00:00:27.549
+========================= 1 succeeded in 00:00:27.549 =========================
+Prepared real product test firmware; no device opened or flashed.

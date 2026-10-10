@@ -14,3 +14,16 @@ export * from "./session.js";
 export * from "./device.js";
 
 export * from "./payment-operation.js";
+export * from "./feepool.js";
+export * from "./standard.js";
+export * from "./fragments.js";
+export * from "./local-secret.js";
+export * from "./connect-envelope.js";
+export * from "./jcs.js";
+export * from "./channel.js";
+export * from "./bitfs-wire.js";
+
+export * from "./network-identity.js";
+
+export * from "./policy-transfer.js";
+export * from "./migration.js";

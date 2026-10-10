@@ -1,6 +1,7 @@
 #pragma once
 #include "../core.hpp"
 #include "bsv.hpp"
+#include "fragments.hpp"
 #include <functional>
 #include <memory>
 namespace vaultlink {
@@ -23,6 +24,9 @@ struct Prepared {
   std::string profile;
   Value core;
   std::unique_ptr<Operation> operation;
+  // One-time private material must never be recoverable from the recent-result
+  // cache. The status/watermark still prevents repeating an accepted request.
+  bool cache_result = true;
 };
 class Endpoint {
   ByteTransport &transport;
@@ -30,6 +34,7 @@ class Endpoint {
   Rng rng;
   uint32_t run, connection = 0, session_id = 0;
   FrameReader frames;
+  FragmentAssembler assembler;
   RequestGate gate;
   std::unique_ptr<Record> receive, send;
   Bytes digest;
@@ -40,10 +45,13 @@ class Endpoint {
   uint64_t last = 0;
   uint32_t recent_id = 0;
   Value recent_payload;
+  bool cache_result = true;
   std::function<Prepared(const std::string &, const Value &, const Bytes &)>
       prepare;
   std::function<void()> disconnected;
   std::function<bool(const std::string &)> confirm_pairing;
+  std::function<int()> pairing_poll;
+  std::vector<Value> capabilities{Value(uint64_t(0x221))};
 #ifdef VLP_E2E_TEST_ONLY
   std::function<Value(const std::string &, const Value &, const Bytes &)>
       extension;
@@ -63,8 +71,9 @@ class Endpoint {
   }
   void encrypted(uint8_t type, const Value &v) {
     require(bool(send), "disconnected");
-    auto bytes = send->seal(type, encode(v));
-    send_frame(type, send->sequence(), bytes);
+    auto parts=message_fragments(v);
+    try {for(auto &plain:parts){WipeBytes clean{plain};auto bytes=send->seal(type,plain);send_frame(type,send->sequence(),bytes);}}
+    catch(...){for(auto &plain:parts)wipe_bytes(plain);throw;}
   }
   void response(const Value &r, const Value &payload) {
     encrypted(17, obj({{"requestId", r.at("requestId")},
@@ -118,7 +127,7 @@ class Endpoint {
                     {"deviceRunId", uint64_t(run)},
                     {"connectionId", uint64_t(connection)},
                     {"protocolVersion", uint64_t(2)},
-                    {"capabilities", Value::list({Value(uint64_t(0x221))})}});
+                    {"capabilities", Value::list(capabilities)}});
     static constexpr char label[] = "vlp:handshake:v2\0";
     digest = sha256(join({text_bytes(label, sizeof(label) - 1),
                           encode(obj({{"hello", h}, {"ack", ack}}), 2048)}));
@@ -149,9 +158,11 @@ class Endpoint {
     uint32_t id = number(active_request.at("requestId"));
     require(gate.finish(id, state) == Error::ok, "invalid-state");
     recent_id = id;
-    recent_payload = payload;
+    auto encoded = encode(payload, 32768); WipeBytes clean{encoded};
+    recent_payload = state != State::completed || (cache_result && encoded.size() <= 32768 - 512) ? payload : obj({{"state", "completed"}, {"resultUnavailable", true}});
     response(active_request, payload);
     active.reset();
+    active_request = Value();
   }
   void business(const Value &r) {
     require(!active, "busy");
@@ -178,6 +189,7 @@ class Endpoint {
     }
     require(!active, "busy");
     active_request = r;
+    cache_result = prepared.cache_result;
     active = std::move(prepared.operation);
     require(bool(active), "unsupported");
   }
@@ -223,7 +235,7 @@ class Endpoint {
                              "denied",        "cancelled", "unknown"};
       Value payload;
       if (recent_id == q.id)
-        payload = Value(encode(recent_payload));
+        payload = Value(encode(recent_payload,32768));
       response(r,
                obj({{"state", names[unsigned(state)]}, {"payload", payload}}));
       return;
@@ -236,16 +248,23 @@ class Endpoint {
       return;
     }
     require(stage > 0 && bool(receive), "disconnected");
-    auto body = decode(receive->open(
-        f.type, f.seq, Bytes(f.payload.begin(), f.payload.begin() + f.size)));
+    auto plain=receive->open(f.type,f.seq,Bytes(f.payload.begin(),f.payload.begin()+f.size));WipeBytes clean{plain};
+    Value body;
+    if(!assembler.accept(plain,transport.millis(),body,f.type)){last=transport.millis();return;}
     last = transport.millis();
     if (stage == 1) {
       require(f.type == 3, "bad-pair");
       body.fields({"code"});
       require(body.at("code").string() == code, "bad-pair");
       // 配对许可由设备产品提供；SDK 不能替产品自动批准。
-      require(confirm_pairing(code), "pairing-denied");
-      encrypted(4, obj({{"paired", true}}));
+      if (pairing_poll) {
+        confirm_pairing(code); // 只打开产品页面，不阻塞串口/按钮主循环。
+        stage = 4;
+        return;
+      }
+      const bool paired = confirm_pairing(code);
+      encrypted(4, obj({{"paired", paired}}));
+      if (!paired) { reset(); return; }
       stage = 2;
       return;
     }
@@ -272,6 +291,7 @@ class Endpoint {
       stage = 3;
       return;
     }
+    require(stage == 3, "awaiting-pairing");
     require(f.type == 16, "invalid-message");
     body.fields(
         {"op", "opVersion", "body", "requestId", "binding", "commitment"});
@@ -293,6 +313,13 @@ class Endpoint {
     } catch (const Failure &e) {
       response(body, obj({{"error", e.what()}}));
     }
+  }
+public:
+  // 设备产品异步实体确认：0 等待、1 同意、-1 拒绝。
+  void set_pairing_poll(std::function<int()> poll) { pairing_poll = std::move(poll); }
+  void set_capabilities(std::vector<Value> caps) {
+    require(stage == 0 && caps.size() <= 32, "invalid-state");
+    capabilities = std::move(caps);
   }
 
 public:
@@ -322,7 +349,9 @@ public:
     receive.reset();
     send.reset();
     gate = RequestGate();
+    assembler.close();
     recent_id = 0;
+    recent_payload = Value();active_request = Value();
     stage = 0;
     session_id = 0;
     identity.lock();
@@ -341,7 +370,21 @@ public:
         }
       }
     }
-    if (stage && transport.millis() - last > 8000) {
+    if (stage == 4 && pairing_poll) {
+      int decision = pairing_poll();
+      if (decision < 0) {
+        // USB remains physically connected after denial. Return the existing
+        // encrypted PAIR_OK(false) before wiping keys, so the host can report
+        // pairing-denied instead of waiting for a serial timeout.
+        encrypted(4, obj({{"paired", false}}));
+        reset(); return;
+      }
+      if (decision > 0) {
+        encrypted(4, obj({{"paired", true}}));
+        stage = 2; last = transport.millis();
+      }
+    }
+    if (stage && transport.millis() - last > (stage == 4 ? 60000 : 8000)) {
       reset();
       frames.close();
     }

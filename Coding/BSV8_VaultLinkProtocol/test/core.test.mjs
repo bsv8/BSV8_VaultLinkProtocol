@@ -208,3 +208,24 @@ test("HELLO capability/connection tamper changes full transcript; wrong expected
     /wrong-key/,
   );
 });
+
+test("fragmented results retain bounded query bytes; one-time material keeps only completion and replay fences", () => {
+  const gate = new RequestGate(), commitment = new Uint8Array(32).fill(7);
+  const request = id => ({ id, sessionId: "current-wallet", commitment });
+  gate.accept(request(1)); gate.start(1);
+  const result = new Uint8Array(8192).fill(0x51);
+  gate.complete(1, result); result.fill(0);
+  assert.equal(gate.query(1, "current-wallet", commitment).payload.length, 8192);
+  assert.equal(gate.query(1, "current-wallet", commitment).payload[0], 0x51);
+  gate.accept(request(2)); gate.start(2);
+  gate.complete(2, new Uint8Array(32).fill(0x42), false);
+  assert.equal(gate.query(2, "current-wallet", commitment).state, "completed");
+  assert.equal(gate.query(2, "current-wallet", commitment).payload, null);
+  assert.equal(gate.accept(request(2)).payload, null);
+  gate.accept(request(3)); gate.start(3);
+  gate.complete(3, new Uint8Array(32768));
+  assert.equal(gate.query(3, "current-wallet", commitment).payload, null);
+  assert.throws(() => gate.accept(request(2)), /replay/);
+  gate.accept(request(4)); gate.start(4);
+  assert.throws(() => gate.complete(4, new Uint8Array(32769)), /invalid-state/);
+});

@@ -1,5 +1,7 @@
+import {wipeResultBytes} from "./secret-value.js";
+import {fragments, FragmentAssembler} from "./fragments.js";
 import { equal, fail, fixed, u32 } from "./bytes.js";
-import { decode, encode, object, type Value } from "./cbor.js";
+import { object, type Value } from "./cbor.js";
 import { FrameReader, frame, Type } from "./frame.js";
 import { commitment, type RecordCipher } from "./crypto.js";
 import { type Transport } from "./transport.js";
@@ -18,7 +20,10 @@ interface Waiting {
 }
 /** 此类只接受已完成配对/持有权验证的会话；生命周期由宿主显式绑定，不伪造 connected。 */
 export class ProtocolClient {
+  private assembler = new FragmentAssembler();
   private nextId = 1;
+  // 串行发送完整消息，避免两个大请求交错分片；控制请求最多等待一个有界消息。
+  private sending: Promise<void> = Promise.resolve();
   private pending = new Map<number, Waiting>();
   private reader = new FrameReader();
   private closed = false;
@@ -49,7 +54,12 @@ export class ProtocolClient {
         const chunk = await this.transport.read();
         if (chunk === null) fail("disconnected");
         for (const f of this.reader.feed(chunk)) {
-          const v = decode(await this.receive.open(f));
+          const plain=await this.receive.open(f);
+          let v: Value | undefined;
+          try{v=await this.assembler.accept(plain,f.type);}finally{plain.fill(0);}
+          if (v === undefined) continue;
+          let delivered=false;
+          try {
           if (f.type === Type.EVENT) {
             const e = object(v, ["kind", "eventSeq", "binding", "payload"]);
             this.checkBinding(e.binding!);
@@ -57,7 +67,7 @@ export class ProtocolClient {
               continue;
             u32(e.eventSeq);
             this.lastEvent = e.eventSeq;
-            this.onEvent(e.payload!);
+            this.onEvent(e.payload!);delivered=true;
             continue;
           }
           if (f.type !== Type.RESPONSE) fail("invalid-response");
@@ -78,7 +88,8 @@ export class ProtocolClient {
             fail("invalid-commitment");
           clearTimeout(p.timer);
           this.pending.delete(r.requestId);
-          p.resolve(r.payload!);
+          delivered=true;p.resolve(r.payload!);
+          }finally{if(!delivered)wipeResultBytes(v);}
         }
       }
     } catch (e) {
@@ -118,14 +129,14 @@ export class ProtocolClient {
     const requestId = this.nextId++;
     const c = fixed(commitment, 32).slice();
     if (c.every((x) => x === 0)) fail("invalid-commitment");
-    const payload = encode({
+    const payload = {
       op,
       opVersion: 1,
       body,
       requestId,
       binding: this.binding as unknown as Value,
       commitment: c,
-    });
+    };
     const result = new Promise<Value>((resolve, reject) => {
       const timer = setTimeout(() => {
         this.pending.delete(requestId);
@@ -138,10 +149,13 @@ export class ProtocolClient {
         commitment: c,
         binding: { ...this.binding },
       });
-      void this.send
-        .seal(Type.REQUEST, payload)
-        .then((f) => this.transport.write(frame(f)))
-        .catch((e) => this.close(e));
+      const sending = this.sending.then(async () => {
+        if (this.closed) fail("disconnected");
+        const parts=await fragments(payload);
+        try{for (const part of parts) await this.transport.write(frame(await this.send.seal(Type.REQUEST, part)));}
+        finally{for(const part of parts)part.fill(0);}
+      });
+      this.sending = sending.catch(e => this.close(e));
     });
     return { requestId, result };
   }
@@ -152,6 +166,7 @@ export class ProtocolClient {
     this.send.close();
     this.receive.close();
     this.reader.reset();
+    this.assembler.close();
     for (const p of this.pending.values()) {
       clearTimeout(p.timer);
       p.reject(reason);

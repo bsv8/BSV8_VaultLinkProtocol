@@ -1,0 +1,75 @@
+Processing m5stack-core-en (platform: espressif32@6.12.0; board: m5stack-core-esp32; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/m5stack-core-esp32.html
+PLATFORM: Espressif 32 (6.12.0) > M5Stack Core ESP32
+HARDWARE: ESP32 240MHz, 320KB RAM, 4MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20017.241212+sha.dcc1105b 
+ - tool-esptoolpy @ 2.40900.250804 (4.9.0) 
+ - toolchain-xtensa-esp32 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 34 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- TFT_eSPI @ 2.5.43
+|-- LittleFS @ 2.0.0
+Building in release mode
+Compiling .pio/build/m5stack-core-en/src/core/app.cpp.o
+Linking .pio/build/m5stack-core-en/firmware.elf
+Retrieving maximum program size .pio/build/m5stack-core-en/firmware.elf
+Checking size .pio/build/m5stack-core-en/firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [===       ]  30.6% (used 100268 bytes from 327680 bytes)
+Flash: [======    ]  58.6% (used 998461 bytes from 1703936 bytes)
+Building .pio/build/m5stack-core-en/firmware.bin with action:
+  "$PYTHONEXE" "$OBJCOPY" --chip esp32 elf2image --flash_mode ${__get_board_flash_mode(__env__)} --flash_freq ${__get_board_f_image(__env__)} --flash_size 4MB --elf-sha256-offset 0xb0 -o $TARGET $SOURCES
+Building .pio/build/m5stack-core-en/firmware.bin
+esptool.py v4.9.0
+Creating esp32 image...
+Merged 2 ELF sections
+Successfully created esp32 image.
+========================= [SUCCESS] Took 25.74 seconds =========================
+
+Processing m5stack-core-e2e-zh-hans (platform: espressif32@6.12.0; board: m5stack-core-esp32; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/m5stack-core-esp32.html
+PLATFORM: Espressif 32 (6.12.0) > M5Stack Core ESP32
+HARDWARE: ESP32 240MHz, 320KB RAM, 4MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20017.241212+sha.dcc1105b 
+ - tool-esptoolpy @ 2.40900.250804 (4.9.0) 
+ - toolchain-xtensa-esp32 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 34 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- TFT_eSPI @ 2.5.43
+|-- LittleFS @ 2.0.0
+Building in release mode
+Compiling .pio/build/m5stack-core-e2e-zh-hans/src/core/app.cpp.o
+Linking .pio/build/m5stack-core-e2e-zh-hans/firmware.elf
+Retrieving maximum program size .pio/build/m5stack-core-e2e-zh-hans/firmware.elf
+Checking size .pio/build/m5stack-core-e2e-zh-hans/firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [===       ]  31.9% (used 104484 bytes from 327680 bytes)
+Flash: [======    ]  64.8% (used 1104529 bytes from 1703936 bytes)
+Building .pio/build/m5stack-core-e2e-zh-hans/firmware.bin with action:
+  "$PYTHONEXE" "$OBJCOPY" --chip esp32 elf2image --flash_mode ${__get_board_flash_mode(__env__)} --flash_freq ${__get_board_f_image(__env__)} --flash_size 4MB --elf-sha256-offset 0xb0 -o $TARGET $SOURCES
+Building .pio/build/m5stack-core-e2e-zh-hans/firmware.bin
+esptool.py v4.9.0
+Creating esp32 image...
+Merged 2 ELF sections
+Successfully created esp32 image.
+========================= [SUCCESS] Took 27.20 seconds =========================
+
+Environment               Status    Duration
+------------------------  --------  ------------
+m5stack-core-en           SUCCESS   00:00:25.744
+m5stack-core-e2e-zh-hans  SUCCESS   00:00:27.205
+========================= 2 succeeded in 00:00:52.949 =========================

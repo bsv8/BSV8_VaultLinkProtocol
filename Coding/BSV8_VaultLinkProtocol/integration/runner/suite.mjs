@@ -370,8 +370,8 @@ export async function runSuite(connector, onResult = () => {}) {
         await reconnect();
         const s = await state("app-1", phase);
         assert(
-          s.session.active === false && integer(s.session.used) === expected,
-          "restart restored authorization or cleared reservation",
+          s.session.active === true && integer(s.session.used) === expected,
+          "restart lost App connection budget or cleared reservation",
         );
         assert(
           status === null ? s.payment === null : s.payment?.state === status,
@@ -380,7 +380,7 @@ export async function runSuite(connector, onResult = () => {}) {
         assert(s.channels.length === 1, "restart lost configuration");
         assert(
           (await pay("old-session")).result.error === "invalid-session",
-          "old App session revived",
+          "new USB connection silently rebound an old App",
         );
         await ok("test.session", { sessionId: "app-2" });
         if (status !== null)
@@ -436,7 +436,7 @@ export async function runSuite(connector, onResult = () => {}) {
       await reconnect();
       const s = await state();
       assert(
-        integer(s.session.used) === 0n && s.session.active === false,
+        integer(s.session.used) === 0n && s.session.active === true,
         "failed reservation restored as committed",
       );
     });
@@ -465,10 +465,10 @@ export async function runSuite(connector, onResult = () => {}) {
         await reconnect(false);
         const s = await state("app-1", "bad-record");
         assert(
-          s.session.active === false &&
+          s.session.active === true &&
             integer(s.session.used) === 0n &&
             s.payment === null,
-          "record failure changed budget or kept authorization",
+          "record failure changed persistent App budget",
         );
       },
     );

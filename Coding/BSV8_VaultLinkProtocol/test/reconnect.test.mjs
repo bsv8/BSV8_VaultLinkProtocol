@@ -6,7 +6,7 @@ import path from "node:path";
 import { DeviceIdentityKey, PaymentPolicy, unhex } from "../dist/index.js";
 import { AtomicFilePolicyStore } from "../src/node-store.mjs";
 
-test("unpowered-device restart: same identity/config, locked old key, no old session or payment replay", async () => {
+test("unpowered-device restart: same identity/config, locked old key, retained App budget, no payment replay", async () => {
   const dir = await mkdtemp(path.join(tmpdir(), "vlp-reconnect-"));
   const privateKey = unhex(
     "0000000000000000000000000000000000000000000000000000000000000001",
@@ -52,17 +52,16 @@ test("unpowered-device restart: same identity/config, locked old key, no old ses
     );
     const snapshot = await recovered.snapshot();
     assert.deepEqual(snapshot.channels, [config]);
-    assert.equal(snapshot.sessions[0].active, false);
+    assert.equal(snapshot.sessions[0].active, true);
     assert.equal(snapshot.sessions[0].used, 7n);
     assert.equal(snapshot.pending[0].state, "unknown");
     await assert.rejects(
       recovered.assertExecutable("payment-one"),
       /invalid-state/,
     );
-    await assert.rejects(
-      recovered.quote({ ...payment, requestId: "payment-two" }),
-      /session/,
-    );
+    assert.equal((await recovered.quote({...payment,requestId:"payment-two"})).used,7n);
+    await recovered.closeSession("connection-one");
+    await assert.rejects(recovered.quote({...payment,requestId:"payment-two"}),/session/);
     await assert.rejects(
       recovered.startSession("connection-two", "app", false),
       /confirmation/,

@@ -1,0 +1,22 @@
+Production SDK builds; E2E test-control API is absent without VLP_E2E_TEST_ONLY.
+Native SDK built; not an ESP32/USB verification.
+passed E2E-01 配对、持有权证明、加密往返与版本标识
+passed E2E-02 额度内真实 P2PKH 签名，输出计额不计矿工费
+passed E2E-03 同付款 ID 重放不签署、不重复扣数
+passed E2E-04 累计超额拒绝与仅批准本次
+passed E2E-05 提高当前累计额度，不改默认/单笔
+passed E2E-06 单笔等于额度免确认、超过额度拒绝
+passed E2E-07 App 跨渠道累计，换渠道不刷新额度
+passed E2E-08 交易证据和承诺篡改被拒绝
+passed E2E-09 等待批准期间查询和取消，不产生签名
+passed E2E-10 等待批准时单业务槽拒绝并发付款
+passed E2E-11 before-reserve 内部重启与恢复
+passed E2E-12 after-reserve 内部重启与恢复
+passed E2E-13 after-sign 内部重启与恢复
+passed E2E-14 after-commit 内部重启与恢复
+passed E2E-15 配置提交前重启保留旧配置
+passed E2E-16 配置提交后重启恢复新配置
+passed E2E-17 实际持久接口失败停止自动支付
+passed E2E-18 未知操作明确拒绝
+passed E2E-19 真实加密记录篡改断链，不签名、不复活授权
+passed E2E-20 错 Key 与拒绝配对不能建立可用会话

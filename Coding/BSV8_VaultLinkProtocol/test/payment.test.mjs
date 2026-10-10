@@ -128,11 +128,14 @@ test("signed/unknown retain budget, known-unexecuted release leaves replay tombs
   await assert.rejects(p.releaseUnexecuted("b"), /unknown/);
   assert.equal((await p.snapshot()).sessions[0].used, 5n);
 });
-test("restart invalidates old session; neither ID reuse nor refresh restores auto allowance", async () => {
+test("restart retains App budget and explicit close prevents revival", async () => {
   const { p, store } = await ready();
   await p.reserve(pay("a", 7n));
   await p.markSigned("a");
   const restored = await PaymentPolicy.open(store, key);
+  assert.equal((await restored.quote(pay("b", 1n))).used, 7n);
+  await assert.rejects(restored.reserve(pay("a", 7n)), /reuse/);
+  await restored.closeSession("session");
   await assert.rejects(restored.quote(pay("b", 1n)), /session/);
   await assert.rejects(
     restored.startSession("session", "owner", true),
@@ -176,4 +179,19 @@ test("plugins have no session cumulative budget and money is BigInt; output-only
   );
   assert.equal(poolPaymentDelta(100n, 109n), 9n);
   assert.throws(() => poolPaymentDelta(100n, 99n));
+});
+
+test('owner default session limit changes atomically across App channels without changing the active session', async()=>{
+ const {p}=await ready();await p.configure(cfg('two'),true);
+ await p.configure({...cfg(),defaultSessionLimit:30n,revision:2},true);
+ const state=await p.snapshot();assert.equal(state.channels.find(c=>c.id==='two').defaultSessionLimit,30n);
+ assert.equal(state.channels.find(c=>c.id==='two').revision,2);assert.equal(state.sessions[0].limit,15n);
+ await p.startSession('next','owner',true);assert.equal((await p.snapshot()).sessions[1].limit,30n);
+});
+test('version 1 policy upgrades without losing channel configuration or previously signed session usage',async()=>{
+ const {p,store}=await ready();await p.reserve(pay('legacy',10n));await p.markSigned('legacy');p.lock();
+ store.value.version=1;delete store.value.pools;
+ const restored=await PaymentPolicy.open(store,key),state=await restored.snapshot();
+ assert.equal(state.version,2);assert.equal(state.channels[0].singleLimit,10n);assert.equal(state.sessions[0].used,10n);
+ assert.equal(state.pending[0].state,'signed');assert.deepEqual(state.pools,[]);
 });

@@ -96,9 +96,9 @@ export function encode(value: Value, maxBytes = MAX_BYTES): Uint8Array {
   visit(value, 0);
   return concat(...parts);
 }
-export function decode(bytes: Uint8Array, maxBytes = MAX_BYTES): Value {
+export function decode(bytes: Uint8Array, maxBytes = MAX_BYTES, maxNodes = Infinity): Value {
   if (bytes.length > maxBytes) fail("message-too-large");
-  let at = 0;
+  let at = 0, nodes = 0;
   const take = (n: number) => {
     if (n < 0 || at + n > bytes.length) fail("truncated");
     const b = bytes.slice(at, at + n);
@@ -106,6 +106,7 @@ export function decode(bytes: Uint8Array, maxBytes = MAX_BYTES): Value {
     return b;
   };
   function read(depth: number): Value {
+    if (++nodes > maxNodes) fail("node-limit");
     const h = take(1)[0]!,
       major = h >> 5,
       ai = h & 31;

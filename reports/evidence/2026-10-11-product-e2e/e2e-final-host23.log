@@ -1,0 +1,86 @@
+mbedTLS 头文件: /opt/homebrew/opt/mbedtls@3/include（crypto 也纳入语法检查）
+  ok   src/board/board.cpp
+  ok   src/board/buttons.cpp
+  ok   src/board/display.cpp
+  ok   src/core/app.cpp
+  ok   src/core/log.cpp
+  ok   src/crypto/aead.cpp
+  ok   src/crypto/digest.cpp
+  ok   src/crypto/ripemd160.cpp
+  ok   src/crypto/secp256k1.cpp
+  ok   src/crypto/secure.cpp
+  ok   src/crypto/x25519.cpp
+  ok   src/i18n/i18n.cpp
+  ok   src/main.cpp
+  ok   src/ops/dispatch.cpp
+  ok   src/ops/local_secret.cpp
+  ok   src/ops/review.cpp
+  ok   src/ops/tx.cpp
+  ok   src/policy/policy.cpp
+  ok   src/proto/cbor.cpp
+  ok   src/proto/frame.cpp
+  ok   src/proto/link.cpp
+  ok   src/store/crc32.cpp
+  ok   src/store/keystore.cpp
+  ok   src/store/vault_fs.cpp
+  ok   src/ui/font.cpp
+  ok   src/ui/text.cpp
+  ok   src/ui/widgets.cpp
+
+语法检查：27 个通过，0 个失败，0 个有警告
+未覆盖（缺 ESP-IDF 头文件）：
+  - src/crypto/rand.cpp
+
+=== 编译 CBOR / 帧 / CRC32 向量测试 ===
+rockey host tests: proto/cbor + proto/frame + store/crc32
+
+83 passed, 0 failed
+
+mbedTLS: /opt/homebrew/opt/mbedtls@3
+
+=== 编译 crypto/aead 对照测试 ===
+rockey host tests: crypto/aead vs mbedtls gcm
+
+974 passed, 0 failed
+
+=== ops ===
+rockey host tests: ops/tx + policy (needs mbedtls)
+
+90 passed, 0 failed
+
+=== dispatch ===
+  src/i18n/i18n.cpp:54:25: warning: array designators are a C99 extension [-Wc99-designator]
+     54 |     ROCKEY_STRING_TABLE(ROCKEY_STR_PICK2)
+        |     ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~
+  src/i18n/strings.h:13:3: note: expanded from macro 'ROCKEY_STRING_TABLE'
+     13 |   X(kImportTitle, "Import same key", "导入同一私钥", "匯入同一私鑰", "匯入同一私鑰", "同じ鍵を取り込む") \
+        |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  src/i18n/i18n.cpp:44:3: note: expanded from macro 'ROCKEY_STR_PICK2'
+     44 |   [ROCKEY_LANG_COL == 2 ? (int)Str::id : 0] = zh_hans,
+        |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  1 warning generated.
+rockey host tests: dispatch freeze gates (needs mbedtls)
+
+32 passed, 0 failed
+
+=== keystore ===
+rockey host tests: keystore (needs mbedtls)
+
+121 passed, 0 failed
+
+=== digest ===
+rockey host tests: crypto/digest vs RFC 5869 + mbedtls
+
+167 passed, 0 failed
+
+=== x25519 ===
+rockey host tests: crypto/x25519 vs RFC 7748
+
+96 passed, 0 failed
+
+=== localsecret ===
+rockey host tests: ops/local_secret (needs mbedtls)
+
+13 passed, 0 failed
+
+主机测试全部通过

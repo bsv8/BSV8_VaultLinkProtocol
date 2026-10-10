@@ -1,0 +1,6 @@
+[release-scan] env=m5stack-core-e2e-en buildId=? elf=21421156 bytes
+  FAIL 符号 DevInjectTestKey 出现在发布固件中
+  FAIL 符号 DevButtonApi 出现在发布固件中
+  FAIL 符号 DevTestControl 出现在发布固件中
+  FAIL 符号 rockey::e2e:: 出现在发布固件中
+PASS: release gate rejected test firmware

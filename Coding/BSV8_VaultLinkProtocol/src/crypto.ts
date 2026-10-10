@@ -1,7 +1,8 @@
 import { be32, concat, equal, fail, fixed, MAX_U64, utf8 } from "./bytes.js";
 import { encode, type Value } from "./cbor.js";
 import { type Frame, MAX_FRAME_PAYLOAD, VERSION } from "./frame.js";
-const raw = (b: Uint8Array): ArrayBuffer => b.slice().buffer as ArrayBuffer;
+// Buffer.slice() is a view into a Node slab; WebCrypto must see exactly these bytes.
+const raw = (b: Uint8Array): ArrayBuffer => new Uint8Array(b).buffer as ArrayBuffer;
 export const sha256 = async (b: Uint8Array): Promise<Uint8Array> =>
   new Uint8Array(await crypto.subtle.digest("SHA-256", raw(b)));
 export const sha256d = async (b: Uint8Array): Promise<Uint8Array> =>
@@ -116,13 +117,10 @@ export async function commitment(
     version > 255
   )
     fail("invalid-profile");
-  return sha256d(
-    concat(
-      utf8("vlp:commit:v2\0" + profile + "\0"),
-      Uint8Array.of(version),
-      encode(core),
-    ),
-  );
+  const encoded=encode(core,32768);
+  let bytes:Uint8Array|undefined;
+  try{bytes=concat(utf8("vlp:commit:v2\0"+profile+"\0"),Uint8Array.of(version),encoded);return await sha256d(bytes);}
+  finally{encoded.fill(0);bytes?.fill(0);}
 }
 export interface RecordContext {
   deviceRunId: number;
