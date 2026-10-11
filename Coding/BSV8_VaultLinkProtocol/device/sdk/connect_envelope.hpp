@@ -10,14 +10,15 @@ struct ConnectReview {
 inline std::string connect_text(const Value &v,size_t minimum,size_t maximum) {
   const auto &s=v.string();require(s.size()>=minimum&&s.size()<=maximum,"invalid-envelope");return s;
 }
-// Only exact canonical Connect v1 envelopes, with the device's own subject.
-inline ConnectReview inspect_connect(const std::string &kind,const Value &body,const Bytes &own_pub) {
+// Only exact canonical Connect v2 envelopes, with the device's own subject.
+inline ConnectReview inspect_connect(const std::string &kind,const Value &body,const Bytes &own_pub,const std::string &own_network="main") {
   require(kind=="identity"||kind=="intent","unsupported");
   bool identity=kind=="identity";
   if(identity)body.fields({"envelope"});else body.fields({"envelope","content"});
   auto raw=body.at("envelope").binary();require(raw.size()<=8192,"invalid-envelope");
-  auto e=decode(raw,8192,256);require(e.kind==Value::Array&&e.array.size()==(identity?8u:9u),"invalid-envelope");
-  require(encode(e,8192)==raw&&e.array[0].integer()==1,"invalid-envelope");
+  auto e=decode(raw,8192,256);require(e.kind==Value::Array&&e.array.size()==(identity?9u:10u),"invalid-envelope");
+  require(encode(e,8192)==raw&&e.array[0].integer()==2,"invalid-envelope");
+  require(e.array.back().string()==own_network,"network-identity-mismatch");
   require(e.array[identity?6:8].binary(33)==own_pub,"wrong-key");
   ConnectReview r;
   r.request=connect_text(e.array[1],1,128);r.audience=connect_text(e.array[2],1,512);

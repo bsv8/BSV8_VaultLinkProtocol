@@ -40,6 +40,7 @@ struct Budget {
 class Policy {
   Store &store;
   std::string key;
+  std::string bsv_network;
   bool alive = true;
   std::vector<Channel> channels;
   std::vector<AppSession> sessions;
@@ -56,7 +57,7 @@ class Policy {
     auto value=obj({{"id",s.id},{"owner",s.owner},{"limit",s.limit},{"used",s.used},{"revision",s.revision},{"active",s.active}});
     if(v3)value.map.push_back({"archivedUsed",Value(s.archived_used)});return value;
   }
-  Value channel_value(const Channel& c)const{return obj({{"id",c.id},{"owner",c.owner},{"kind",c.kind},{"network","main"},{"paymentType",c.payment_type},{"singleLimit",c.single},{"defaultSessionLimit",c.total},{"revision",c.revision},{"enabled",c.enabled}});}
+  Value channel_value(const Channel& c)const{return obj({{"id",c.id},{"owner",c.owner},{"kind",c.kind},{"network",bsv_network},{"paymentType",c.payment_type},{"singleLimit",c.single},{"defaultSessionLimit",c.total},{"revision",c.revision},{"enabled",c.enabled}});}
   Value pool_value(const PoolState& p)const{auto value=obj({{"id",p.id},{"binding",p.binding},{"paid",p.paid}});if(archived)value.map.emplace_back("archivedPaid",Value(p.archived_paid));return value;}
   Value payment_value(const Payment& p)const{
     return obj({{"id",p.id},{"channelId",p.channel},{"sessionId",p.session.empty()?Value():Value(p.session)},
@@ -126,8 +127,8 @@ class Policy {
   }
 
 public:
-  Policy(Store &s, std::string public_key,std::function<Bytes(const Bytes&)> hash = {})
-      : store(s), key(std::move(public_key)),digest(std::move(hash)) {
+  Policy(Store &s, std::string public_key,std::function<Bytes(const Bytes&)> hash = {}, std::string network = "main")
+      : store(s), key(std::move(public_key)),bsv_network(std::move(network)),digest(std::move(hash)) {
     auto bytes = store.load();
     if (bytes.empty())
       return;
@@ -162,7 +163,7 @@ public:
                 "enabled", "kind", "network", "paymentType"});
       require((v.at("kind").string() == "app" ||
                v.at("kind").string() == "plugin") &&
-                  v.at("network").string() == "main" &&
+                  v.at("network").string() == bsv_network &&
                   (v.at("paymentType").string() == "p2pkh" || v.at("paymentType").string()=="feepool.connect" || v.at("paymentType").string()=="feepool.bitfs" || v.at("paymentType").string()=="bsv.standard" || v.at("paymentType").string()=="feepool.bitfs.cosigner" || v.at("paymentType").string()=="feepool.connect.cosigner"),
               "unsupported");
       channels.push_back({v.at("id").string(), v.at("owner").string(),
@@ -278,7 +279,7 @@ public:
       cs.push_back(obj({{"id", c.id},
                         {"owner", c.owner},
                         {"kind", c.kind},
-                        {"network", "main"},
+                        {"network", bsv_network},
                         {"paymentType", c.payment_type},
                         {"singleLimit", c.single},
                         {"defaultSessionLimit", c.total},

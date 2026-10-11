@@ -4,7 +4,7 @@ import {createHash} from 'node:crypto';
 import {DeviceIdentityKey,encode,inspectConnectEnvelope,connectCompactSignature,sha256,ConnectEnvelopeOperation} from '../dist/index.js';
 const key=new DeviceIdentityKey(Uint8Array.from([...new Uint8Array(31),1]));
 const pub=key.publicKey();
-function identity(claims=[]){return encode([1,'request','https://app.example',100,200,'Identity',pub,claims],8192);}
+function identity(claims=[]){return encode([2,'request','https://app.example',100,200,'Identity',pub,claims,"main"],8192);}
 test('WebCrypto hashes only the actual Node Buffer view',async()=>{
   const slab=Buffer.alloc(128,7),slice=slab.subarray(19,40);
   assert.deepEqual(Buffer.from(await sha256(slice)),createHash('sha256').update(slice).digest());
@@ -23,7 +23,7 @@ test('Connect identity: exact envelope, own subject, low-S compact interoperabil
 });
 test('Connect intent requires exact complete content and cancellation prevents signing',async()=>{
   const content=new TextEncoder().encode('actual intent');
-  const envelope=encode([1,'request','https://app.example',100,200,'Intent','text/plain',await sha256(content),pub],8192);
+  const envelope=encode([2,'request','https://app.example',100,200,'Intent','text/plain',await sha256(content),pub,"main"],8192);
   const body={envelope,content};
   const review=await inspectConnectEnvelope('intent',body,pub);assert.equal(review.contentLength,13);
   await assert.rejects(inspectConnectEnvelope('intent',{envelope,content:new Uint8Array()},pub),/invalid-content/);
@@ -40,4 +40,10 @@ test('Connect rejects wrong identity, unordered or duplicate claims, trailing by
   await assert.rejects(inspectConnectEnvelope('identity',{envelope:await sha256(identity())},pub));
   await assert.rejects(inspectConnectEnvelope('identity',{envelope:identity(),digest:new Uint8Array(32)},pub));
   await assert.rejects(inspectConnectEnvelope('identity',{envelope:identity([['large',Array(256).fill(null)]])},pub),/node-limit/);
+});
+
+test('Connect v2 signs the network and rejects same-key cross-network requests',async()=>{
+  const testEnvelope=encode([2,'request','https://app.example',100,200,'Identity',pub,[],"test"],8192);
+  await assert.rejects(inspectConnectEnvelope('identity',{envelope:testEnvelope},pub,"main"),/network-identity-mismatch/);
+  assert.equal((await inspectConnectEnvelope('identity',{envelope:testEnvelope},pub,"test")).bsvNetwork,"test");
 });

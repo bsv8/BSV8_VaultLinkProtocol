@@ -370,9 +370,9 @@ export class DeviceIdentityKey {
     return secp256k1.sign(digest,this.key,{prehash:false,lowS:true}).toDERRawBytes();
   }
   async signConnectEnvelope(kind: import("./connect-envelope.js").ConnectEnvelopeKind, body: import("./cbor.js").Value,
-    signal: AbortSignal, authorize: (review: import("./connect-envelope.js").ConnectEnvelopeReview) => Promise<boolean>): Promise<Uint8Array> {
+    signal: AbortSignal, authorize: (review: import("./connect-envelope.js").ConnectEnvelopeReview) => Promise<boolean>, network: "main" | "test" = "main"): Promise<Uint8Array> {
     const {inspectConnectEnvelope} = await import("./connect-envelope.js");
-    const review = await inspectConnectEnvelope(kind,structuredClone(body),this.publicKey());
+    const review = await inspectConnectEnvelope(kind,structuredClone(body),this.publicKey(),network);
     const digest=review.digest.slice();
     if (!(await authorize(structuredClone(review)))) fail("denied");
     if (this.closed) fail("locked");
