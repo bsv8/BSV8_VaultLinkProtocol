@@ -29,11 +29,20 @@ test('actual C++ durable journal preserves host commitment through erase stages 
     assert.equal(run('begin').status,0);
     const first=await readFile(path);
     assert.equal(run('erased',hex(new Uint8Array(32).fill(3))).status,1);assert.deepEqual(await readFile(path),first);
+    assert.equal(run('device-committed').status,0);
+    const freshId='cccccccc-cccc-cccc-cccc-cccccccccccc';
+    assert.equal(run('begin','-',freshId).status,0);
+    assert.equal(run('device-committed','-',initial().id).status,1);
+    assert.equal(run('begin').status,0);
     assert.equal(run('device-committed').status,0);assert.equal(run('device-committed').status,0);
     assert.equal(run('host-committed',hex(new Uint8Array(32).fill(3))).status,0);
+    assert.equal(run('begin','-',freshId).status,1);
     const committed=await readFile(path);
     assert.equal(run('host-committed',hex(new Uint8Array(32).fill(4))).status,1);assert.deepEqual(await readFile(path),committed);
     assert.equal(run('erasing',hex(new Uint8Array(32).fill(3)),'cccccccc-cccc-cccc-cccc-cccccccccccc').status,1);
+    // Software completion leaves a usable backup; optional disposal may follow.
+    assert.equal(run('complete',hex(new Uint8Array(32).fill(3))).status,0);
+    assert.equal(run('erasing',hex(new Uint8Array(32).fill(4))).status,1);
     for(const phase of ['erasing','erased','complete']) {
       assert.equal(run(phase,hex(new Uint8Array(32).fill(3))).status,0);
       const current=decodeDeviceMigration(new Uint8Array(await readFile(path)));

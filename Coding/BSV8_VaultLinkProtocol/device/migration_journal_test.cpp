@@ -31,7 +31,13 @@ int main(int argc,char** argv) {
       target=Value(bytes);
     }
     if(std::string(argv[3])=="begin") {
-      require(journal.status().kind!=Value::Null,"missing-journal");journal.begin(journal.status());
+      require(journal.status().kind!=Value::Null,"missing-journal");auto proposed=journal.status();
+      for(auto& field:proposed.map) {
+        if(field.first=="id")field.second=Value(argv[2]);
+        if(field.first=="phase")field.second=Value("staged");
+        if(field.first=="targetHash")field.second=Value();
+      }
+      journal.begin(proposed);
     }else journal.advance(argv[2],argv[3],target);
     // Reopen the actual committed disk record and validate its exact state.
     MigrationJournal reopened(store);require(encode(journal.status(),1024)==encode(reopened.status(),1024),"readback-failed");

@@ -57,7 +57,14 @@ class MigrationJournal {
         }
         require(encode(initial,1024)==encode(next,1024),"migration-conflict");return;
       }
-      require(!pending(),"migration-conflict");
+      // Export does not remove the device key. An unacknowledged export may
+      // be superseded by a fresh physically authorized request; records that
+      // bind a committed target or an import must never be replaced this way.
+      const bool abandoned_export=record.at("direction").string()=="to-software"
+        &&next.at("direction").string()=="to-software"
+        &&record.at("targetHash").kind==Value::Null
+        &&record.at("publicKey").binary(33)==next.at("publicKey").binary(33);
+      require(!pending()||abandoned_export,"migration-conflict");
     }
     persist(std::move(next));
   }
@@ -68,8 +75,8 @@ class MigrationJournal {
     if(target)targetHash.binary(32);else require(targetHash.kind==Value::Null,"migration-conflict");
     if(old==phase) {require(encode(record.at("targetHash"))==encode(targetHash),"migration-conflict");return;}
     bool legal=(old=="staged"&&phase=="device-committed")||(old=="device-committed"&&phase=="host-committed")
-      ||(direction=="to-hardware"&&old=="host-committed"&&phase=="complete")
-      ||(direction=="to-software"&&((old=="host-committed"&&phase=="erasing")
+      ||(old=="host-committed"&&phase=="complete")
+      ||(direction=="to-software"&&(((old=="host-committed"||old=="complete")&&phase=="erasing")
         ||(old=="erasing"&&phase=="erased")||(old=="erased"&&phase=="complete")));
     require(legal,"migration-conflict");
     if(old!="staged"&&old!="device-committed")require(encode(record.at("targetHash"))==encode(targetHash),"migration-conflict");
