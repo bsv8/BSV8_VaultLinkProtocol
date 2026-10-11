@@ -38,6 +38,55 @@ function wire() {
 const priv = unhex(
   "0000000000000000000000000000000000000000000000000000000000000001",
 );
+test("both pairing codes are visible before host approval; device approval alone cannot prove possession", async () => {
+  const [host, device] = wire(), key = new DeviceIdentityKey(priv);
+  let shown, approveHost, proofs = 0;
+  const visible = new Promise(resolve => { shown = resolve; });
+  const approval = new Promise(resolve => { approveHost = resolve; });
+  const deviceKey = {
+    publicKey: () => key.publicKey(),
+    provePossession: (...args) => { proofs++; return key.provePossession(...args); },
+  };
+  const ready = acceptDevice(device, deviceKey, 81, 82, async code => { shown(code); return true; });
+  const connected = connectHost(host, {walletGeneration:1,backendGeneration:1,hostRunGeneration:1},
+    key.publicKey(), secpIdentityVerifier, async code => {
+      let timer;
+      try {
+        assert.equal(await Promise.race([visible, new Promise((_, reject) => {
+          timer = setTimeout(() => reject(Error("device pairing code not visible before host approval")), 500);
+        })]), code);
+        assert.equal(proofs, 0);
+        return await approval;
+      } finally { clearTimeout(timer); }
+    });
+  try {
+    await Promise.race([visible, connected]);
+    approveHost(true);
+    const client = await connected;
+    const session = await ready;
+    assert.equal(proofs, 1);
+    const server = new DeviceServer(session, () => key.close());
+    const loops = [server.run(), client.run()];
+    await client.close(); await Promise.all(loops);
+  } finally {
+    approveHost(false); await host.close(); await device.close();
+    await Promise.allSettled([connected, ready]); key.close();
+  }
+});
+test("host refusal after the device displays and approves pairing grants no possession proof", async () => {
+  const [host,device]=wire(),key=new DeviceIdentityKey(priv);
+  let shown,proofs=0;
+  const visible=new Promise(resolve=>{shown=resolve;});
+  const ready=acceptDevice(device,{
+    publicKey:()=>key.publicKey(),
+    provePossession:(...args)=>{proofs++;return key.provePossession(...args);},
+  },83,84,async code=>{shown(code);return true;});
+  const connected=connectHost(host,{walletGeneration:1,backendGeneration:1,hostRunGeneration:1},key.publicKey(),secpIdentityVerifier,
+    async code=>{assert.equal(await visible,code);return false;});
+  const results=await Promise.allSettled([ready,connected]);
+  assert.ok(results.every(result=>result.status==='rejected'));
+  assert.equal(proofs,0);key.close();
+});
 test("full physical-pairing callbacks, possession proof, encrypted request and response roundtrip", async () => {
   const [host, device] = wire(),
     key = new DeviceIdentityKey(priv);

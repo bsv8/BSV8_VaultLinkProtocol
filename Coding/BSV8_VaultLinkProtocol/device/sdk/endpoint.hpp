@@ -384,7 +384,9 @@ public:
         stage = 2; last = transport.millis();
       }
     }
-    if (stage && transport.millis() - last > (stage == 4 ? 60000 : 8000)) {
+    // HELLO/配对/持有权证明都属于握手；设备先确认后，主机仍可能
+    // 等用户核对，不能把 stage 2 当成已建立连接的 8 秒心跳期限。
+    if (stage && transport.millis() - last > (stage == 3 ? 8000 : 60000)) {
       reset();
       frames.close();
     }
