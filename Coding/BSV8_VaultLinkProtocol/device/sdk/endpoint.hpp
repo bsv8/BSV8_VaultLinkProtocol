@@ -342,6 +342,7 @@ public:
     extension = std::move(f);
   }
 #endif
+  bool connected() const { return stage == 3; }
   void reset() {
     if (active)
       active->cancel();

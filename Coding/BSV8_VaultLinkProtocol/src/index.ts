@@ -29,3 +29,7 @@ export * from "./policy-transfer.js";
 export * from "./migration.js";
 
 export { NetworkIdentityOperation } from "./connect-envelope.js";
+
+export * from "./signing-channel.js";
+
+export { NetworkIdentityOperation as NetworkIdentitySigningOperation } from "./network-identity.js";

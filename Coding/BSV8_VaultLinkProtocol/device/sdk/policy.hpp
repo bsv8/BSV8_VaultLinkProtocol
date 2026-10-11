@@ -1,5 +1,6 @@
 #pragma once
 #include "cbor.hpp"
+#include "signing_channel.hpp"
 #include <functional>
 namespace vaultlink {
 // 存储适配必须原子提交；SDK 从不把失败当成功。真实 ESP32 使用 NVS blob +
@@ -46,6 +47,8 @@ class Policy {
   std::vector<AppSession> sessions;
   std::vector<Payment> payments;
   std::vector<PoolState> pools;
+  bool signing_enabled=false;
+  std::vector<Value> signing_channels;
   bool archived=false;
   std::vector<Value> archived_payments,archived_sessions;
   std::function<Bytes(const Bytes&)> digest;
@@ -135,22 +138,29 @@ public:
     auto state = decode(bytes, 65536);
     auto version=state.at("version").integer();
     if(version==1)state.fields({"version", "key", "channels", "sessions", "pending"});
+    else if(version==4)state.fields({"version", "key", "channels", "sessions", "pending", "pools","archive","network","signing"});
     else if(version==3)state.fields({"version", "key", "channels", "sessions", "pending", "pools","archive"});
     else state.fields({"version", "key", "channels", "sessions", "pending", "pools"});
-    require((version==1 || version==2 || version==3) &&
+    require((version==1 || version==2 || version==3 || version==4) &&
                 state.at("key").string() == key,
             "corrupt-state");
+    if(version==4){
+      require(state.at("network").string()==bsv_network,"network-identity-mismatch");
+      const auto& rows=state.at("signing");require(rows.kind==Value::Array&&rows.array.size()<=32,"corrupt-state");
+      for(const auto& c:rows.array){inspect_signing_channel(c);for(const auto& old:signing_channels)require(old.at("id").string()!=c.at("id").string(),"corrupt-state");signing_channels.push_back(c);}signing_enabled=true;
+    }
     const auto &cs = state.at("channels"), &ss = state.at("sessions"),
                &ps = state.at("pending");
     require(cs.kind == Value::Array && ss.kind == Value::Array &&
                 ps.kind == Value::Array && cs.array.size() <= 32 &&
                 ss.array.size() <= 16 && ps.array.size() <= 256,
             "corrupt-state");
-    if(version==3){archived=true;require(bool(digest),"archive-hash-adapter-required");auto& a=state.at("archive");a.fields({"payments","sessions"});
+    if(version>=3){archived=true;auto& a=state.at("archive");a.fields({"payments","sessions"});
       // Consume the decoded archive once; cloning it while the whole input
       // tree is live can exhaust the device heap during restart recovery.
       archived_payments=std::move(a.at("payments").array);archived_sessions=std::move(a.at("sessions").array);
       require(a.at("payments").kind==Value::Array&&a.at("sessions").kind==Value::Array&&archived_payments.size()<=512&&archived_sessions.size()<=512,"corrupt-state");
+      require(bool(digest)||(archived_payments.empty()&&archived_sessions.empty()),"archive-hash-adapter-required");
       for(const auto* entries:{&archived_payments,&archived_sessions})for(size_t i=0;i<entries->size();++i){const auto& e=entries->at(i);if(entries==&archived_sessions)e.fields({"idHash","recordHash","record"});else e.fields({"idHash","recordHash"});e.at("idHash").binary(32);e.at("recordHash").binary(32);
         for(size_t j=0;j<i;++j)require(entries->at(j).at("idHash").binary(32)!=e.at("idHash").binary(32),"corrupt-state");}
     }
@@ -173,11 +183,11 @@ public:
                           v.at("kind").string(),v.at("paymentType").string()});
     }
     for (const auto &v : ss.array) {
-      if(version==3)v.fields({"id", "owner", "limit", "used", "revision", "active","archivedUsed"});
+      if(version>=3)v.fields({"id", "owner", "limit", "used", "revision", "active","archivedUsed"});
       else v.fields({"id", "owner", "limit", "used", "revision", "active"});
       sessions.push_back({v.at("id").string(), v.at("owner").string(),
                           v.at("limit").integer(), v.at("used").integer(),
-                          v.at("revision").integer(), v.at("active").flag(),version==3?v.at("archivedUsed").integer():0});
+                          v.at("revision").integer(), v.at("active").flag(),version>=3?v.at("archivedUsed").integer():0});
     }
     for (const auto &v : ps.array) {
       if(version==1)v.fields({"id", "channelId", "sessionId", "amount", "configRevision", "sessionRevision", "commitment", "state"});
@@ -193,7 +203,7 @@ public:
         payments.back().pool={p.at("id").string(),p.at("binding").binary(32),p.at("previousPaid").integer(),p.at("paid").integer()};}
     }
     if(version>=2){const auto &pool_list=state.at("pools");require(pool_list.kind==Value::Array && pool_list.array.size()<=256,"corrupt-state");
-      for(const auto &v:pool_list.array){if(version==3)v.fields({"id","binding","paid","archivedPaid"});else v.fields({"id","binding","paid"});pools.push_back({v.at("id").string(),v.at("binding").binary(32),v.at("paid").integer(),version==3?v.at("archivedPaid").integer():0});}}
+      for(const auto &v:pool_list.array){if(version>=3)v.fields({"id","binding","paid","archivedPaid"});else v.fields({"id","binding","paid"});pools.push_back({v.at("id").string(),v.at("binding").binary(32),v.at("paid").integer(),version>=3?v.at("archivedPaid").integer():0});}}
     for (size_t i = 0; i < channels.size(); ++i) {
       auto &c = channels[i];
       identifier(c.id);
@@ -257,12 +267,14 @@ public:
       const auto head=[&](uint8_t major,size_t n){if(counting)add(cbor_size(Value(uint64_t(n)),65536));else cbor_head(bytes,major,n);};
       const auto value=[&](const Value& v,unsigned depth){if(counting)add(cbor_size(v,65536,depth));else cbor_write(v,bytes,65536,depth);};
       const auto key_field=[&](const char* name){value(Value(name),1);};
-      head(5,archived?7:6);
+      head(5,signing_enabled?9:archived?7:6);
       key_field("key");value(Value(key),1);
       key_field("pools");head(4,pools.size());for(const auto& p:pools)value(pool_value(p),2);
       if(archived){key_field("archive");head(5,2);value(Value("payments"),2);head(4,archived_payments.size());for(const auto& p:archived_payments)value(p,3);value(Value("sessions"),2);head(4,archived_sessions.size());for(const auto& s:archived_sessions)value(s,3);}
+      if(signing_enabled){key_field("network");value(Value(bsv_network),1);}
       key_field("pending");head(4,payments.size());for(const auto& p:payments)value(payment_value(p),2);
-      key_field("version");value(Value(uint64_t(archived?3:2)),1);
+      if(signing_enabled){key_field("signing");head(4,signing_channels.size());for(const auto& c:signing_channels)value(c,2);}
+      key_field("version");value(Value(uint64_t(signing_enabled?4:archived?3:2)),1);
       key_field("channels");head(4,channels.size());for(const auto& c:channels)value(channel_value(c),2);
       key_field("sessions");head(4,sessions.size());for(const auto& s:sessions)value(session_value(s,archived),2);
     };
@@ -290,14 +302,37 @@ public:
     std::vector<Value> pool_values;pool_values.reserve(pools.size());for(const auto& p:pools){auto value=obj({{"id",p.id},{"binding",p.binding},{"paid",p.paid}});if(archived)value.map.push_back({"archivedPaid",Value(p.archived_paid)});pool_values.push_back(std::move(value));}
     // An initializer_list copies its const elements. Build and move the large
     // arrays directly so a snapshot never duplicates the entire CBOR ledger.
-    Value result; result.kind=Value::Map; result.map.reserve(archived?7:6);
-    result.map.emplace_back("version",Value(uint64_t(archived?3:2)));
+    Value result; result.kind=Value::Map; result.map.reserve(signing_enabled?9:archived?7:6);
+    result.map.emplace_back("version",Value(uint64_t(signing_enabled?4:archived?3:2)));
     result.map.emplace_back("key",Value(key));
     result.map.emplace_back("channels",Value::list(std::move(cs)));
     result.map.emplace_back("sessions",Value::list(std::move(ss)));
     result.map.emplace_back("pending",Value::list(std::move(ps)));
     result.map.emplace_back("pools",Value::list(std::move(pool_values)));
+    if(signing_enabled){result.map.emplace_back("network",Value(bsv_network));result.map.emplace_back("signing",Value::list(signing_channels));}
     if(archived){Value archive;archive.kind=Value::Map;archive.map.reserve(2);archive.map.emplace_back("payments",Value::list(archived_payments));archive.map.emplace_back("sessions",Value::list(archived_sessions));result.map.emplace_back("archive",std::move(archive));}return result;
+  }
+  Value signing_view() const {require(alive,"policy-unavailable");return Value::list(signing_channels);}
+  Value signing_channel(const std::string& id,const std::string& operation="") const {
+    require(alive,"policy-unavailable");for(const auto& c:signing_channels)if(c.at("id").string()==id){require(operation.empty()||c.at("operation").string()==operation,"channel-conflict");return c;}throw Failure("channel-required");
+  }
+  // 只由首次注册的真实设备确认调用。建议和修订号不覆盖现有策略。
+  void register_signing(const Value& rows,bool confirmed){
+    require(alive&&rows.kind==Value::Array&&!rows.array.empty()&&rows.array.size()<=32,"invalid-signing-channel");
+    for(size_t i=0;i<rows.array.size();++i)for(size_t j=0;j<i;++j)require(rows.array[i].at("id").string()!=rows.array[j].at("id").string(),"invalid-signing-channel");
+    auto next=signing_channels;
+    for(const auto& c:rows.array){inspect_signing_channel(c);auto it=std::find_if(next.begin(),next.end(),[&](const Value& v){return v.at("id").string()==c.at("id").string();});
+      if(it!=next.end()){require(same_signing_registration(*it,c),"channel-conflict");continue;}
+      require(confirmed&&c.at("revision").integer()==1,"confirmation-required");require(next.size()<32,"capacity");next.push_back(c);
+    }
+    if(next.size()==signing_channels.size())return;
+    signing_channels=std::move(next);signing_enabled=archived=true;persist();
+  }
+  // 不提供 USB 修改入口：只有本机设置菜单持有这个能力。
+  void configure_signing(const std::string& id,const std::string& mode,uint64_t expected){
+    auto current=signing_channel(id);require(current.at("revision").integer()==expected&&expected<0xfffffffe,"stale-config");
+    current.at("mode")=Value(mode);current.at("revision")=Value(expected+1);inspect_signing_channel(current);
+    for(auto& c:signing_channels)if(c.at("id").string()==id)c=current;persist();
   }
   void configure(const Channel &c, bool confirmed) {
     require(alive, "policy-unavailable");

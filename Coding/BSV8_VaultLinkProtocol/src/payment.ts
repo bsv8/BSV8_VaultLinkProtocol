@@ -1,3 +1,4 @@
+import {inspectSigningChannel,sameSigningRegistration,type SigningChannel,type SigningMode} from "./signing-channel.js";
 import {sha256 as digest256} from "@noble/hashes/sha256";
 import {encode,type Value} from "./cbor.js";
 import { addMoney, equal, fail, fixed, hex, money, MAX_U64 } from "./bytes.js";
@@ -73,7 +74,9 @@ export interface Approval {
   raiseSessionLimit?: bigint;
 }
 export interface PolicySnapshot {
-  version: 2|3;
+  version: 2|3|4;
+  network?: "main" | "test";
+  signing?: SigningChannel[];
   archive?:{payments:ArchiveEntry[];sessions:ArchiveSessionEntry[]};
   key: string;
   channels: ChannelConfig[];
@@ -192,7 +195,7 @@ export class PaymentPolicy {
       archive.sessions.push({idHash:policyArchiveId(session.id),recordHash:policyArchiveRecord(record),record});
       s.sessions=s.sessions.filter(x=>x.id!==session.id);changed=true;
     }}
-    if(changed){s.version=3;s.archive=archive;for(const session of s.sessions)session.archivedUsed??=0n;for(const pool of s.pools)pool.archivedPaid??=0n;
+    if(changed){s.version=s.version===4?4:3;s.archive=archive;for(const session of s.sessions)session.archivedUsed??=0n;for(const pool of s.pools)pool.archivedPaid??=0n;
       try{PaymentPolicy.validate(s,s.key);encode({...s,pending:s.pending.map(p=>({...p,pool:p.pool??null}))} as unknown as Value,65536);}
       catch(e){this.state=before;throw e;}
     }
@@ -278,7 +281,7 @@ export class PaymentPolicy {
         used: 0n,
         revision: 1,
         active: true,
-        ...(this.state.version===3?{archivedUsed:0n}:{}),
+        ...(this.state.version>=3?{archivedUsed:0n}:{}),
       });
       await this.persist();
     });
@@ -384,7 +387,7 @@ export class PaymentPolicy {
             id: copy.pool.id,
             binding: copy.pool.binding.slice(),
             paid: copy.pool.paid,
-            ...(this.state.version===3?{archivedPaid:0n}:{}),
+            ...(this.state.version>=3?{archivedPaid:0n}:{}),
           });
       }
       await this.persist();
@@ -439,6 +442,47 @@ export class PaymentPolicy {
       }
       /* 保留墓碑防 requestId 再执行。 */ p.state = "released";
       await this.persist();
+    });
+  }
+  /** 与支付账本原子存储、一起迁移；重复注册只校验来源，绝不覆盖用户决定。 */
+  async registerSigning(channels: SigningChannel[], network: "main" | "test", confirmed: boolean): Promise<SigningChannel[]> {
+    const copies = channels.map(inspectSigningChannel);
+    if(!copies.length||copies.length>32||new Set(copies.map(c=>c.id)).size!==copies.length)fail("invalid-signing-channel");
+    return this.run(async () => {
+      if (network !== "main" && network !== "test") fail("network-identity-required");
+      if (this.state.network && this.state.network !== network || this.state.channels.some(c => c.network !== network)) fail("network-identity-mismatch");
+      const next = structuredClone(this.state.signing ?? []);
+      for (const c of copies) {
+        const old = next.find(x => x.id === c.id);
+        if (old) { if (!sameSigningRegistration(old,c)) fail("channel-conflict"); continue; }
+        if (!confirmed || c.revision !== 1) fail("confirmation-required");
+        if (next.length >= 32) fail("capacity");
+        next.push(c);
+      }
+      const changed = next.length !== (this.state.signing?.length ?? 0);
+      if (changed) {
+        this.state.version=4;this.state.network=network;this.state.signing=next;
+        this.state.archive ??= {payments:[],sessions:[]};
+        for(const s of this.state.sessions)s.archivedUsed ??= 0n;
+        for(const p of this.state.pools)p.archivedPaid ??= 0n;
+        await this.persist();
+      }
+      return copies.map(c => structuredClone(next.find(x=>x.id===c.id)!));
+    });
+  }
+  /** 调用者只能是钱包设置入口；主机协议不能转发这个能力给硬件。 */
+  async configureSigning(id: string, mode: SigningMode, expectedRevision: number): Promise<void> {
+    return this.run(async () => {
+      const c=this.state.signing?.find(x=>x.id===id);if(!c)fail("channel-required");
+      if(c.revision!==expectedRevision)fail("stale-config");
+      const next=inspectSigningChannel({...c,mode,revision:c.revision+1});Object.assign(c,next);await this.persist();
+    });
+  }
+  async signingChannel(channelId: string, operation: string, network: "main" | "test"): Promise<SigningChannel> {
+    return this.run(async () => {
+      if(this.state.network!==network)fail("network-identity-mismatch");
+      const c=this.state.signing?.find(x=>x.id===channelId);if(!c||c.operation!==operation)fail("channel-required");
+      return structuredClone(c);
     });
   }
   async snapshot(): Promise<PolicySnapshot> {
@@ -538,7 +582,7 @@ export class PaymentPolicy {
   private static validate(s: PolicySnapshot, key: string): void {
     if (
       !s ||
-      (s.version !== 2&&s.version!==3) ||
+      (s.version !== 2&&s.version!==3&&s.version!==4) ||
       s.key !== key ||
       !Array.isArray(s.channels) ||
       !Array.isArray(s.sessions) ||
@@ -550,7 +594,11 @@ export class PaymentPolicy {
       s.pending.length > 256
     )
       fail("corrupt-state");
-    if(s.version===3){
+    if(s.version===4){
+      if((s.network!=="main"&&s.network!=="test")||!Array.isArray(s.signing)||s.signing.length>32||s.channels.some(c=>c.network!==s.network))fail("corrupt-state");
+      const ids=new Set<string>();for(const c of s.signing){inspectSigningChannel(c);if(ids.has(c.id))fail("corrupt-state");ids.add(c.id);}
+    }else if(s.signing!==undefined||s.network!==undefined)fail("corrupt-state");
+    if(s.version>=3){
       if(!s.archive||!Array.isArray(s.archive.payments)||!Array.isArray(s.archive.sessions)||s.archive.payments.length>512||s.archive.sessions.length>512)fail('corrupt-state');
       for(const entries of [s.archive.payments]){
         const ids=new Set<string>();for(const e of entries){if(Object.keys(e).sort().join()!=='idHash,recordHash')fail('corrupt-state');fixed(e.idHash,32);fixed(e.recordHash,32);if(ids.has(hex(e.idHash)))fail('corrupt-state');ids.add(hex(e.idHash));}

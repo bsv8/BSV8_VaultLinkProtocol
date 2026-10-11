@@ -40,6 +40,7 @@ test('software disk ledger migrates through actual C++ Policy with closed budget
   PaymentPolicy.inspectSnapshot(forgotten,key);
   assert.throws(()=>assertPaymentPolicyContinuation(received,forgotten,key),/policy-rollback/);
   const corrupt=decode(new Uint8Array(await readFile(bank)),65536);corrupt.sessions[0].used=0;assert.throws(()=>decodePaymentPolicy(encode(corrupt,65536),key),/corrupt-state/);await writeFile(bank,encode(corrupt,65536));assert.equal(spawnSync(exe,[bank,key],{encoding:'utf8'}).status,1);
-  assert.throws(()=>assertHardwarePaymentPolicy({...received,channels:received.channels.map(c=>({...c,network:'test'}))},key),/unsupported-policy/);
+  assert.doesNotThrow(()=>assertHardwarePaymentPolicy({...received,channels:received.channels.map(c=>({...c,network:'test'}))},key));
+  assert.throws(()=>assertHardwarePaymentPolicy({...received,channels:received.channels.map(c=>({...c,network:'invalid'}))},key),/unsupported-policy/);
  }finally{await rm(dir,{recursive:true,force:true});}
 });

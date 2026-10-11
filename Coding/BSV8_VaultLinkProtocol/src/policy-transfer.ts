@@ -1,3 +1,4 @@
+import {inspectSigningChannel,sameSigningRegistration} from "./signing-channel.js";
 import { fail, MAX_U64 } from "./bytes.js";
 import { decode,encode,object,type Value } from "./cbor.js";
 import { PaymentPolicy,policyArchiveId,policyArchiveRecord,type ArchiveEntry,type PolicySnapshot } from "./payment.js";
@@ -17,18 +18,19 @@ export function encodePaymentPolicy(snapshot:PolicySnapshot,key:string):Uint8Arr
 }
 export function decodePaymentPolicy(raw:Uint8Array,key:string):PolicySnapshot {
  const decoded=decode(raw,65536);if(!decoded||typeof decoded!=="object"||Array.isArray(decoded)||decoded instanceof Uint8Array)fail("corrupt-state");const version=uint((decoded as Record<string,Value>).version);
- const x=object(decoded,version===3n?["version","key","channels","sessions","pending","pools","archive"]:["version","key","channels","sessions","pending","pools"]);
- if(version!==2n&&version!==3n)fail("corrupt-state");
- const s:PolicySnapshot={version:Number(version) as 2|3,key:text(x.key),
+ const x=object(decoded,version===4n?["version","key","channels","sessions","pending","pools","archive","network","signing"]:version>=3n?["version","key","channels","sessions","pending","pools","archive"]:["version","key","channels","sessions","pending","pools"]);
+ if(version!==2n&&version!==3n&&version!==4n)fail("corrupt-state");
+ const s:PolicySnapshot={version:Number(version) as 2|3|4,key:text(x.key),
   channels:list(x.channels).map(v=>{const c=object(v,["id","owner","kind","network","paymentType","enabled","singleLimit","defaultSessionLimit","revision"]);
    const kind=text(c.kind);if(kind!=="plugin"&&kind!=="app")fail("corrupt-state");
    return {id:text(c.id),owner:text(c.owner),kind,network:text(c.network),paymentType:text(c.paymentType),enabled:flag(c.enabled),singleLimit:uint(c.singleLimit),defaultSessionLimit:uint(c.defaultSessionLimit),revision:revision(c.revision)};}),
-  sessions:list(x.sessions).map(v=>{const s=object(v,version===3n?["id","owner","limit","used","revision","active","archivedUsed"]:["id","owner","limit","used","revision","active"]);return {id:text(s.id),owner:text(s.owner),limit:uint(s.limit),used:uint(s.used),revision:revision(s.revision),active:flag(s.active),...(version===3n?{archivedUsed:uint(s.archivedUsed)}:{})};}),
+  sessions:list(x.sessions).map(v=>{const s=object(v,version>=3n?["id","owner","limit","used","revision","active","archivedUsed"]:["id","owner","limit","used","revision","active"]);return {id:text(s.id),owner:text(s.owner),limit:uint(s.limit),used:uint(s.used),revision:revision(s.revision),active:flag(s.active),...(version>=3n?{archivedUsed:uint(s.archivedUsed)}:{})};}),
   pending:list(x.pending).map(v=>{const p=object(v,["id","channelId","sessionId","amount","commitment","configRevision","sessionRevision","state","pool"]);
    const state=text(p.state);if(state!=="reserved"&&state!=="signed"&&state!=="unknown"&&state!=="released")fail("corrupt-state");
    return {id:text(p.id),channelId:text(p.channelId),sessionId:p.sessionId===null?null:text(p.sessionId),amount:uint(p.amount),commitment:bytes(p.commitment),configRevision:revision(p.configRevision),sessionRevision:revision(p.sessionRevision),state,...(p.pool===null?{}:{pool:pool(p.pool!)})};}),
-  pools:list(x.pools).map(v=>{const p=object(v,version===3n?["id","binding","paid","archivedPaid"]:["id","binding","paid"]);return {id:text(p.id),binding:bytes(p.binding),paid:uint(p.paid),...(version===3n?{archivedPaid:uint(p.archivedPaid)}:{})};})};
- if(version===3n){const a=object(x.archive!,["payments","sessions"]);const entries=(v:Value)=>list(v).map(e=>{const x=object(e,["idHash","recordHash"]);return {idHash:bytes(x.idHash),recordHash:bytes(x.recordHash)};});s.archive={payments:entries(a.payments!),sessions:list(a.sessions).map(e=>{const x=object(e,["idHash","recordHash","record"]),r=object(x.record!,["id","owner","limit","used","revision","active","archivedUsed"]);return {idHash:bytes(x.idHash),recordHash:bytes(x.recordHash),record:{id:text(r.id),owner:text(r.owner),limit:uint(r.limit),used:uint(r.used),revision:revision(r.revision),active:flag(r.active),archivedUsed:uint(r.archivedUsed)}};})};}
+  pools:list(x.pools).map(v=>{const p=object(v,version>=3n?["id","binding","paid","archivedPaid"]:["id","binding","paid"]);return {id:text(p.id),binding:bytes(p.binding),paid:uint(p.paid),...(version>=3n?{archivedPaid:uint(p.archivedPaid)}:{})};})};
+ if(version>=3n){const a=object(x.archive!,["payments","sessions"]);const entries=(v:Value)=>list(v).map(e=>{const x=object(e,["idHash","recordHash"]);return {idHash:bytes(x.idHash),recordHash:bytes(x.recordHash)};});s.archive={payments:entries(a.payments!),sessions:list(a.sessions).map(e=>{const x=object(e,["idHash","recordHash","record"]),r=object(x.record!,["id","owner","limit","used","revision","active","archivedUsed"]);return {idHash:bytes(x.idHash),recordHash:bytes(x.recordHash),record:{id:text(r.id),owner:text(r.owner),limit:uint(r.limit),used:uint(r.used),revision:revision(r.revision),active:flag(r.active),archivedUsed:uint(r.archivedUsed)}};})};}
+ if(version===4n){const network=text(x.network);if(network!=="main"&&network!=="test")fail("corrupt-state");s.network=network;s.signing=list(x.signing).map(v=>{const c=object(v,["id","owner","kind","operation","mode","revision"]);return inspectSigningChannel({id:text(c.id),owner:text(c.owner),kind:text(c.kind) as "app"|"plugin",operation:text(c.operation),mode:text(c.mode) as "automatic"|"manual",revision:revision(c.revision)});});}
  return PaymentPolicy.inspectSnapshot(s,key);
 }
 /** Device migration must reject unsupported channels before transferring a key. */
@@ -44,6 +46,10 @@ export function assertHardwarePaymentPolicy(snapshot:PolicySnapshot,key:string):
  * sessions, payment identities and pool baselines cannot go backwards. */
 export function assertPaymentPolicyContinuation(source: PolicySnapshot, current: PolicySnapshot, key: string): void {
   const before = PaymentPolicy.inspectSnapshot(source, key), after = PaymentPolicy.inspectSnapshot(current, key);
+  if(before.version===4){
+    if(after.version!==4||after.network!==before.network)fail("policy-rollback");
+    for(const c of before.signing!){const next=after.signing!.find(x=>x.id===c.id);if(!next||!sameSigningRegistration(c,next)||next.revision<c.revision||(next.revision===c.revision&&next.mode!==c.mode))fail("policy-rollback");}
+  }
   for (const c of before.channels) {
     const next = after.channels.find(x => x.id === c.id);
     if (!next || next.owner !== c.owner || next.kind !== c.kind || next.network !== c.network || next.paymentType !== c.paymentType

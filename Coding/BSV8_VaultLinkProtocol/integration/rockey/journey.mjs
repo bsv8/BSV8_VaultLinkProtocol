@@ -98,7 +98,11 @@ export async function review(link, mode = "allow") {
     // The injection acknowledgment precedes normal debounce and UI drawing.
     // Wait for the real controller state, rather than reading the first frame
     // while the release event is still pending.
-    await waitFor(() => link.status(), (s) => s.ui.raise, "increase toggle");
+    await waitFor(
+      () => link.status(),
+      (s) => s.ui.raise,
+      "increase toggle",
+    );
   }
   await link.press(1, 2000);
   check(
@@ -120,9 +124,8 @@ export async function enroll(link, journey, { deny = false } = {}) {
     (s) => s.status === "pairing",
     "host pairing",
   );
-  // 产品固件在收到 PAIR_CONFIRM 后才展示设备配对页。
-  // 主机先确认自己的码，再核对设备实际显示值，随后走设备按钮决定。
-  await journey.rpc("pair", { leaseId: state.leaseId, allow: true });
+  // 当前配对单边由设备确认，正式连接服务已自动发送展示请求。
+  // 浏览器只展示核对码，不再调用已删除的主机人工 pair 控制接口。
   console.info("[RocKey E2E] waiting for device pairing");
   const device = await waitFor(
     () => link.status(),
@@ -299,20 +302,94 @@ export async function runJourney(
         old.paymentType === paymentType,
       "test channel identity mismatch",
     );
-    await decided({
-      action: "configure",
-      channel: {
-        id,
-        owner,
-        kind,
-        network: "main",
-        paymentType,
-        enabled: true,
-        singleLimit: "400",
-        defaultSessionLimit: kind === "app" ? "500" : "0",
-        revision: (old?.revision ?? 0) + 1,
-      },
-    });
+    // 主机设置能力已删除：先检查拒绝，然后只用真实按钮修改本机菜单。
+    let hostError;
+    try {
+      await journey.payment({
+        action: "configure",
+        channel: {
+          ...old,
+          enabled: true,
+          singleLimit: "400",
+          defaultSessionLimit: kind === "app" ? "500" : "0",
+          revision: old.revision + 1,
+        },
+      });
+    } catch (e) {
+      hostError = e.message;
+    }
+    check(
+      hostError === "hardware-settings-local",
+      "host must not configure wallet policy",
+    );
+    const signatures = await journey.payment({ action: "signing-list" });
+    // 首次注册后重新读取，不能使用注册前缺少新记录的列表。
+    const actualChannels = await journey.payment({ action: "list" });
+    const selectedIndex =
+      signatures.length + actualChannels.findIndex((c) => c.id === id);
+    check(
+      Number((await snapshot()).screen) === 9,
+      "local settings must begin at product menu",
+    );
+    for (
+      let n = 0;
+      n < 11 && Number((await snapshot()).menuSelected) !== 10;
+      n++
+    )
+      await link.press(2);
+    check(
+      Number((await snapshot()).menuSelected) === 10,
+      "channel menu not selected",
+    );
+    await link.press(1);
+    check(
+      Number((await snapshot()).screen) === 17,
+      "channel settings not opened",
+    );
+    for (let n = 0; n < selectedIndex; n++) await link.press(2);
+    await link.press(1);
+    const current = actualChannels.find((c) => c.id === id);
+    if (!current.enabled) {
+      await link.press(1);
+      await link.press(2);
+      await link.press(1, 2000);
+    }
+    // 无论是否修改模式，保证每个字段编辑从列表重新进入，不依赖前一个保存。
+    if (current.enabled) await link.press(0, 2000);
+    async function setAmount(field, previous, target) {
+      if (previous === target) return;
+      await link.press(1);
+      for (let n = 0; n < field; n++) await link.press(2);
+      await link.press(1);
+      const from = previous.padStart(20, "0"),
+        to = target.padStart(20, "0"),
+        span = Math.max(previous.length, target.length);
+      for (let n = 0; n < span; n++) {
+        const at = 19 - n,
+          up = (Number(to[at]) - Number(from[at]) + 10) % 10,
+          down = (10 - up) % 10;
+        for (let j = 0; j < Math.min(up, down); j++)
+          await link.press(up <= down ? 2 : 0);
+        if (n + 1 < span) await link.press(1);
+      }
+      await link.press(1, 2000);
+    }
+    await setAmount(1, current.singleLimit, "400");
+    if (kind === "app") await setAmount(2, current.defaultSessionLimit, "500");
+    await link.press(0, 2000);
+    check(
+      Number((await snapshot()).screen) === 9,
+      "local settings did not return to menu",
+    );
+    const saved = (await journey.payment({ action: "list" })).find(
+      (c) => c.id === id,
+    );
+    check(
+      saved.enabled &&
+        saved.singleLimit === "400" &&
+        (kind !== "app" || saved.defaultSessionLimit === "500"),
+      "local buttons did not persist actual limits",
+    );
   }
   const used = async () =>
     BigInt((await journey.rpc("session-read", { id: session })).used);
