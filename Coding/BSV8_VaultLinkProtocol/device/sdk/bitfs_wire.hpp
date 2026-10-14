@@ -47,7 +47,7 @@ inline PoolReview inspect_bitfs_authorization(const Bytes &raw,const std::vector
   auto wire=inspect_bitfs_wire(obj({{"kind",Value(uint64_t(5))},{"document",document}}),own);auto authorization=bitfs_authorization(document);const auto &v=authorization.array;
   auto review=inspect_pool(raw,previous,own,"bitfs","state","payer"),baseline=inspect_pool(refund,previous,own,"bitfs","state","payer");
   auto target=parse_tx(raw),original=parse_tx(refund);
-  require(review.paid==v[3].integer()&&target.inputs[0].sequence==v[2].integer()&&target.outputs.size()==3&&target.outputs[2].amount==0&&target.locktime==0&&baseline.paid==0&&original.inputs[0].sequence<target.inputs[0].sequence&&sha256d(refund)==v[1].binary(),"invalid-authorization");
+  require(review.paid==v[3].integer()&&target.inputs[0].sequence==v[2].integer()&&target.outputs.size()==3&&target.outputs[2].amount==0&&target.locktime==original.locktime&&baseline.paid==0&&original.inputs[0].sequence<target.inputs[0].sequence&&sha256d(refund)==v[1].binary(),"invalid-authorization");
   review.review.digests={wire.digest};return review;
 }
 inline PoolReview inspect_bitfs_opening(const Bytes &raw,const Bytes &request,const Bytes &own){
