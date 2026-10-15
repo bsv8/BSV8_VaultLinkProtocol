@@ -2,7 +2,7 @@
 
 此入口不同于 `integration:hardware` 的 SDK 示例固件测试，执行真实 RocKey 产品 App 与 Keymaster Worker 适配器。设计及人工门禁见 [需求与施工单](../../../../docs/产品E2E设计与施工单.md)。
 
-在 `BSV8_VaultLinkProtocol/Coding/BSV8_VaultLinkProtocol` 运行：
+在 `VaultLinkProtocol/Coding/BSV8_VaultLinkProtocol` 运行：
 
 ```sh
 npm run integration:rockey:prepare

@@ -1,6 +1,6 @@
-# BSV8_VaultLinkProtocol
+# VaultLinkProtocol
 
-**BSV8 VaultLink Protocol（VLP）**：应用与密钥设备之间的语义操作、身份绑定、会话授权与结果交付协议。
+**VaultLinkProtocol（VLP）**：应用与密钥设备之间的语义操作、身份绑定、会话授权与结果交付协议。
 
 当前施工版本 **VLP 0.2 Draft / wire 2**；原 0.1 保留为历史审计基线。本仓库维护共同规范、机器可读 schema、公开向量与兼容性工具。
 Keymaster 与 Rockey 是首批参考接入方，**不是协议固有依赖**。
