@@ -6,7 +6,7 @@ const id=n=>new Uint8Array(32).fill(n);
 test('BitFS exact authentication document uses the existing wire domain and physical decision',async()=>{
  const key=makeKey(1),buyer=makeKey(2);
  try{
-  const doc=encode([await sha256(Uint8Array.of(1,2,3)),buyer.publicKey(),100n,200n,3n,2000n,encode([]),'seed.bin'],16384),body={kind:1,document:doc};
+  const doc=encode([await sha256(Uint8Array.of(1,2,3)),buyer.publicKey(),100n,200n,3n,2000n,encode([]),'seed.bin',64n],16384),body={kind:1,document:doc};
   let approvals=0;const handler=new BitfsWireOperation(key,async review=>{assert.equal(review.kind,1);assert.ok(review.facts.some(f=>f.name==='seedPrice'&&f.value==='100'));approvals++;return true;});
   const core=await handler.verify(body);assert.equal(await handler.authorize(core,new AbortController().signal),true);
   const result=await handler.execute(core,new AbortController().signal);verifyChannelSignature(result.signature,await bitfsWireDigest(1,doc),key.publicKey());assert.equal(approvals,1);
